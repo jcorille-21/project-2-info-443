@@ -35,6 +35,7 @@ Initially the components were linked together by relationship, but this ended up
 |`/schema`|Defines a MongoDB schema, which is like a table in SQL|
 |`/types`|Defines objects that may be used in Mongoose|
 
+
 # Applied Perspective
 
 ![Schema Example](img/schema.png)
@@ -45,6 +46,7 @@ It’s important to understand that MongoDB is a document-based database. In con
 Therefore, the main perspective that the Mongoose library falls under is the **Usability Perspective** by which it allows its users (Node.js developers) to more easily interact with the target system (MongoDB database) in order to work more effectively.  As it is an Object Document Mapper (ODM), it provides the functionality for its users to actually enforce that schema design. This then serves as an interface to the MongoDB database where those users can perform CRUD operations on entries in the collection while still abiding by said schema restrictions.
 
 With the Usability Perspective in mind, one of the main concerns that Mongoose tries to address is **Information Quality**. The concern is that if information within a database cannot be relied upon due to a lack of consistency, then the database cannot be utilized in a way that the developers intended for. Overall, the goal of this perspective in the Mongoose system is to allow developers to avoid the common pitfall of using inconsistent approaches to data entry validation when reading and writing to their databases.
+
 
 # Identify Styles and Patterns
 
@@ -58,3 +60,54 @@ The Mongoose itself follows an Facade pattern, as it translates between objects 
 
 
 
+# Architectural Assessment
+
+## Open Close Principle
+
+![Open Closed Principle 1](img/OpenClosed-1.png)
+
+Instead of hard coding data types of Mongoose schemas, Mongoose developers opted for processing each (supported) data types in separate files/modules. They are being referenced in SchemaType(path, options, instance) located in ./lib/schematype.js . This allows MongoDB developers to create more files/modules to support new data type of MongoDB in future.
+
+![Open Closed Principle 1](img/OpenClosed-2.png)
+
+## Single Responsibility Principle
+
+![Open Closed Principle 1](img/OpenClosed-1.png)
+
+JavaScript files within `./lib/schema` handles data type (of the corresponding MongoDB schema types) individually (each JavaScript file handles own MongoDB data type). For instance, code handling String data type don’t need to know the code handling Date data type. Clients of Mongoose will define MongoDB schemas in a fashion similar to this:
+`const postSchema = new mongoose.Schema({
+url: String,
+description: String,
+username: String,
+likes: [String],
+created_date: Date
+})`
+
+## Dependency Inversion Principle
+
+Within `./lib/error` directory, there are several error handling files that extends `MongooseError` class , and `MongooseError` class also extends the built-in JavaScript `Error` class.
+![Dependency Inversion Principle 1](img/DepInv-1.png)
+
+![Dependency Inversion Principle 2](img/DepInv-2.png)
+
+In the `DivergentArrayError` that extends `MongooseError`, it has a `super(msg)` function that calls the `MongooseError` super class. This coding style follows dependency inversion principle, because developers can add new (more specific) `MongooseError` class files that extends `MongooseError`.
+
+## Interface Segregation Principle
+TODO
+
+##Law of Demeter
+
+Web applications using Mongoose will communicate with Mongoose itself, rather directly to MongoDB. Mongoose forward clients’ requests to MongoDB.
+
+![Law of Demeter 1](img/Demeter-1.png)
+
+Also, the example used in Open Close Principle and Single Responsibility Principle follows the Law of Demeter, as the function using a Data Type processor (with respect to MongoDB Data Type) don’t need to know the actual implementation of processors themselves.
+
+## Liskov Substitution Principle
+TODO
+
+## Composite Reuse Principle
+
+![Composite Reuse Principle 1](img/CompReuse-1.png)
+
+Within `./lib/cast` folder, `boolean.js` uses an instance of `CastError` when it can’t convert a given to a boolean value. Since `boolean.js` does not inherit the `CastError` itself and the `CastError` can exist by itself without `boolean.js` codes, `boolean.js` follows the Composite Reuse Principle.
