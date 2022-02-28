@@ -45,3 +45,16 @@ It’s important to understand that MongoDB is a document-based database. In con
 Therefore, the main perspective that the Mongoose library falls under is the **Usability Perspective** by which it allows its users (Node.js developers) to more easily interact with the target system (MongoDB database) in order to work more effectively.  As it is an Object Document Mapper (ODM), it provides the functionality for its users to actually enforce that schema design. This then serves as an interface to the MongoDB database where those users can perform CRUD operations on entries in the collection while still abiding by said schema restrictions.
 
 With the Usability Perspective in mind, one of the main concerns that Mongoose tries to address is **Information Quality**. The concern is that if information within a database cannot be relied upon due to a lack of consistency, then the database cannot be utilized in a way that the developers intended for. Overall, the goal of this perspective in the Mongoose system is to allow developers to avoid the common pitfall of using inconsistent approaches to data entry validation when reading and writing to their databases.
+
+# Identify Styles and Patterns
+
+## High-level architectural style
+We believe that the mongoose applies the Layered architectural style. The users’ script works as the presentational layer and the mongoose works as the business layer, and the mongoDB is the data layer.
+![Example of Layered architectural style](img/exampleOfLayered.png)
+
+## Facade Pattern
+The Mongoose itself follows an Facade pattern, as it translates between objects in JavaScript code and the representation of those objects in MongoDB. JavaScript developers can perform MongoDB operations by invoking Mongoose in typical JavaScript-like syntax rather than referencing MongoDB Shell syntax.
+![Example of relationship of Mongoose and MongoDB](img/example.png)
+
+
+
