@@ -12,7 +12,7 @@ People who maintain mongoose are a team or company called Automattic. This compa
 
 # Development View
 
-![Component Diagram](img/proj2_components.png)
+![Component Diagram](img/componentDiagram.png)
 *Figure 1: Components of Mongoose*
 
 We created a component diagram that details relationships between other components. Our components scope is limited to **directories/folders**. Our reasoning is that there are too many code files to individually analyze, so breaking it up into directories as components felt like the natural thing to do. In our diagram, each component has a **required interface** section and a **provided interface** section.
