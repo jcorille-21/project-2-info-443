@@ -255,15 +255,11 @@ The MongoDB native syntax to create a table and [define a schema](https://docs.m
 In contrast, for JavaScript clients using mysql and mysql2 modules to interact with MySQL database, JavaScript clients need to use SQL query to perform database operations (highlighted part are SQL syntax, the rest of them are JavaScript syntax).
 ![app.get](img/Screen Shot 2022-03-14 at 4.42.43 PM.png)
 
-### b. Error classes that extend MongooseError
+## b: `lib/error/mongooseError.js` and Error classes (within the `lib/error` folder) that extend `MongooseError`.
 
 ![Law of Demeter 2](img/Demeter-2.png)
 
 Error-handling classes – such as CastError, DivergentArrayError, MissingSchemaError, DocumentNotFoundError – all extend the MongooseError object, and MongooseError extends the built-in JavaScript Error object. String, Boolean, and some other client classes interact with direct implementations of MongooseError rather than MongooseError itself, and these client classes do not need to know the behavior of MongooseError nor the built-in JavaScript Error Object. As a result, error-handling classes structures within Mongoose follow the Law of Demeter as well.
-
-## b: `lib/error/mongooseError.js` and Error classes (within the `lib/error` folder) that extend `MongooseError`.
-
-TO BE FILLED by Jason Xu
 
 ## Liskov Substitution Principle
 
