@@ -89,34 +89,25 @@ Additionally, many developers use their own branches to test code. As of the tim
 
 # Applied Perspective
 
-![Schema Example](img/schema.png)
-*Figure 6: Example of defined schema using Mongoose*
+While Mongoose provides many advantages that promote its prevalence among JavaScript programs that need to interact with MongoDB, we choose to analyze Mongoose library’s **Performance Perspective**. Because Mongoose handles many queries from MongoDB, the performance of the system is very important to consider when looking at the architecture. The query speed should be fast so users perform operations on MongoDB in a timely manner.
 
-It’s important to understand that MongoDB is a document-based database. In contrast to relational databases, this means that their data stored can be ‘unstructured’. While this offers benefits such as a more streamlined process of updating entries in the database, the lack of a rigid schema can make it difficult to enforce restrictions or specific data types allowed to be entered in the database.
+## Response Time
 
-Therefore, the main perspective that the Mongoose library falls under is the **Usability Perspective** by which it allows its users (Node.js developers) to more easily interact with the target system (MongoDB database) in order to work more effectively.  As it is an Object Document Mapper (ODM), it provides the functionality for its users to actually enforce that schema design. This then serves as an interface to the MongoDB database where those users can perform CRUD operations on entries in the collection while still abiding by said schema restrictions.
+When JavaScript developers uses Mongoose, they will define a typed schema by using new mongoose.Schema({}) API similar to the one below, where as each field are typed.
 
-**Information Quality**.
-The concern is that if information within a database cannot be relied upon due to a lack of consistency, then the database cannot be utilized in a way that the developers intended for.
+![](img/image10.png)
+However, when JavaScript programs add data to MongoDB using Mongoose, Mongoose will first attempt to cast the provided input to the predefined schema types by going through a series of if-statement checks (which would take extra time), even though the user adds a correct-typed value. The concern of slowed response time due to type checking and casting is least useful for a large and clean dataset, according to [this blog post](https://towardsdatascience.com/the-drastic-mistake-of-using-mongoose-to-handle-your-big-data-a3c408e21a4c).
 
-Thus, the schema type enforcement reduces the client code’s need to add more code (insert design pattern here) to check returned data (from database) and cast to client’s desired type.
+For instance, if user pass in false (a boolean-typed value) at a table field that requires boolean value, according to lib/cast/boolean.js , Mongoose still need test whether false is within `Set([true, 'true', 1, '1', 'yes'])` to see whether false is a truthy value before testing whether this falsy value. As a result, Mongoose will have a higher response time to input a false value to the database compared to input a true value.
 
-![SanitizeFilter](img/sanitize.png)
-*Figure 7: Example of sanitizeFilter function*
+Code snippet within `lib/cast/boolean.js file`
+![](img/image15.png)
 
-One example of this is that Mongoose’s library provides a `sanitizeFilter()` function that wraps any nested objects containing a property whose name starts with `$`(which are query operators) in a `$eq` instead. This prevents malicious users from executing query selector injection attacks and further ensures that the data passed in can be more trusted.
+As another example, when users wants to insert a value to a String-typed field, Mongoose needs to first check whether the user passed in a null value or the user passed in the ID value of a document first, before checking whether this value can be casted to a String using the default .toString() method on an object. As a result, inserting an Object ID to a String-typed field takes less time (aka. reducing the database operations’ response time) compared to inserting a String-typed value to String-typed field; this issue is evident when we are inserting a large amount of data that is guaranteed to be String-typed.
 
-**Usability with the Interface**.
-
-When developers are constantly working with their MongoDB database to fetch and insert data, Mongoose plays a pivotal role in making the process easier for them to interact with the interface. For instance, Mongoose allows users to easily define relationships between two schemas via the `type` and `ref` properties which point to the `ObjectId` of the specific schema it is related to.
-
-![Mongoose Validation](img/validator.png)
-*Figure 8: Custom Validation in Data Schemas within Mongoose*
-
-Mongoose also improves usability by allowing for custom, flexible data validation. The example above showcases how users can define a `validator` function where one can set the schema to only hold strings that meet the conditions of the defined regular expression when trying to insert data.
-
-Overall, the goal of this perspective in the Mongoose system is to allow developers to avoid the common pitfall of using inconsistent approaches to data entry validation when reading and writing to their databases.
-
+Code snippet in `lib/cast/string.js`
+![](img/image11.png)
+Side note on type casting and system predictability: the time consumption of type-casting processes is predictable, as all input values always go through <type>.js file to attempt casting value to the desired type (according to the type of schema). In addition, <type>.js files’ behaviors will not change during runtime, making type-casting operation stable (even though it reduces response time for Mongoose to insert values to MongoDB.
 
 # Identify Styles and Patterns
 
