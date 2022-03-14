@@ -212,7 +212,7 @@ Like DivergentArrayError, CastError also extends MongooseError functionality by 
 In the boolean.js file, one can modify which values should be interpreted as true or false by modifying content in two Set objects, without the need to modify the actual boolean casting logic. As a result, one may choose to add the equivalent of “true” or “false” in other languages (such as “oui” or “non” in French) by adding them in the convertToTrue and convertToFalse Sets.
 
 ## Single Responsibility Principle
-
+### a: `lib/schema` folder
 ![Open Closed Principle 1](img/OpenClosed-1.png)
 
 JavaScript files within `./lib/schema` handles data type (of the corresponding MongoDB schema types) individually (each JavaScript file handles own MongoDB data type). For instance, code handling String data type don’t need to know the code handling Date data type. Clients of Mongoose will define MongoDB schemas in a fashion similar to this:
@@ -224,7 +224,13 @@ likes: [String],
 created_date: Date
 })`
 
+### b: `lib/error/mongooseError.js` and Error classes (within the lib/error folder) that extend MongooseError.
+![](img/image35.png)
+MongooseError’s sole responsibility is to throw an Error (built-in JavaScript Error) object with the name of “Mongoose”, allowing client program developers to easily distinguish error from Mongoose or other external modules (dependencies) when debugging their JavaScript programs.
+
 ## Dependency Inversion Principle
+
+TODO: Crosby add this part
 
 Within `./lib/error` directory, there are several error handling files that extends `MongooseError` class , and `MongooseError` class also extends the built-in JavaScript `Error` class.
 ![Dependency Inversion Principle 1](img/DepInv-1.png)
@@ -233,18 +239,26 @@ Within `./lib/error` directory, there are several error handling files that exte
 
 In the `DivergentArrayError` that extends `MongooseError`, it has a `super(msg)` function that calls the `MongooseError` super class. This coding style follows dependency inversion principle, because developers can add new (more specific) `MongooseError` class files that extends `MongooseError`.
 
-## Interface Segregation Principle
-TODO
+## Principle of Least Knowledge (Law of Demeter)  (from INFO 443 OOP Principles lecture)
 
-##Law of Demeter
+### a: Mongoose Schema object creation
+Mongoose provides an abstracted interface allowing JavaScript programs to interact with MongoDB (such as create a table and define a schema on this table) using Mongoose syntax instead of the MongoDB native syntax. Thus, clients don’t need to understand the internals of MongoDB syntax, as long as they can use Mongoose syntax correctly. Since Mongoose translates and forwards client requests to MongoDB, Mongoose’s provided interface adheres to the Law of Demeter principle.
 
-Web applications using Mongoose will communicate with Mongoose itself, rather directly to MongoDB. Mongoose forward clients’ requests to MongoDB.
 
 ![Law of Demeter 1](img/Demeter-1.png)
 
-Also, the example used in Open Close Principle and Single Responsibility Principle follows the Law of Demeter, as the function using a Data Type processor (with respect to MongoDB Data Type) don’t need to know the actual implementation of processors themselves.
+Here is an example of [database schema creation](https://mongoosejs.com/docs/guide.html) using Mongoose syntax
+![](img/Screen Shot 2022-03-14 at 4.39.56 PM.png)
+
+The MongoDB native syntax to create a table and [define a schema](https://docs.mongodb.com/manual/core/schema-validation/#std-label-schema-validation-json) for this table is similar to this:
+![](img/Screen Shot 2022-03-14 at 4.41.08 PM.png)
+
+In contrast, forJavaScript clients using mysql and mysql2 modules to interact with MySQL database, JavaScript clients need to use SQL query to perform database operations (highlighted part are SQL syntax, the rest of them are JavaScript syntax).
+![](img/Screen Shot 2022-03-14 at 4.42.43 PM.png)
 
 ## Liskov Substitution Principle
+
+### a: `lib/types/subdocument.js` that adds more behaviors to `lib/document.js`
 
 For the **Liskov Substitution Principle**, there are two classes that promote this design pattern. These files are located in `lib/document.js`, which is the Document class, and `lib/types/subdocument.js`, which is the SubDocument class. See Figures ? and ?? below.
 
@@ -255,6 +269,10 @@ For the **Liskov Substitution Principle**, there are two classes that promote th
 *Figure ??: `lib/types/subdocument.js`*
 
 These two classes promote the *Liskov Substitution Principle* because the `SubDocument` could completely replace an instance of the `Document` class. This is because the `SubDocument` checks if there is a valid parent of itself. If there isn’t, then it just calls the `Document` class. This means that the `SubDocument` instance would just be a `Document` object. There is some extra logic when it does have a parent, but it still calls the `Document` class in the end.
+
+## b: checkRequired functions in several `.js` files within `lib/schema`, and checkRequired function of lib/schematype.js
+
+TODO: Crosby need to add this part
 
 ## Composite Reuse Principle
 
