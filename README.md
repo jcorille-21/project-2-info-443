@@ -162,7 +162,15 @@ Also, the example used in Open Close Principle and Single Responsibility Princip
 
 ## Liskov Substitution Principle
 
-For the **Liskov Substitution Principle**, there are two classes that promote this design pattern. These files are located in `lib/document.js`, which is the Document class, and `lib/types/subdocument.js`, which is the SubDocument class. See Figures ? and ? below.
+For the **Liskov Substitution Principle**, there are two classes that promote this design pattern. These files are located in `lib/document.js`, which is the Document class, and `lib/types/subdocument.js`, which is the SubDocument class. See Figures ? and ?? below.
+
+![document.js](img/documentDotJs.png)
+*Figure ?: `lib/document.js`*
+
+![subdocument.js](img/subdocumentDotJs.png)
+*Figure ??: `lib/types/subdocument.js`*
+
+These two classes promote the *Liskov Substitution Principle* because the `SubDocument` could completely replace an instance of the `Document` class. This is because the `SubDocument` checks if there is a valid parent of itself. If there isn’t, then it just calls the `Document` class. This means that the `SubDocument` instance would just be a `Document` object. There is some extra logic when it does have a parent, but it still calls the `Document` class in the end.
 
 ## Composite Reuse Principle
 
