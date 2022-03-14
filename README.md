@@ -107,11 +107,19 @@ As another example, when users wants to insert a value to a String-typed field, 
 
 Code snippet in `lib/cast/string.js`
 ![](img/image11.png)
+
 Side note on type casting and system predictability: the time consumption of type-casting processes is predictable, as all input values always go through <type>.js file to attempt casting value to the desired type (according to the type of schema). In addition, <type>.js files’ behaviors will not change during runtime, making type-casting operation stable (even though it reduces response time for Mongoose to insert values to MongoDB.
 
-## Response Time
+## Throughput
 
-TO BE FILLED BY Jerome
+MongoDB is a document-based database, indicating its data can be unstructured. If information (and its data type) within a database cannot be relied upon due to a lack of schema consistency, then it is more challenging for JavaScript client developers  to interact with MongoDB databases even via Mongoose. 
+
+When using Mongoose, JavaScript client developers can set the database schema type while defining the table schema (such as declaring a String-typed column called `title`, in the below example). In contrast, developers need to explicitly define a typed-schema separately if they use native MongoDB syntax ([source](https://docs.mongodb.com/manual/core/schema-validation/#std-label-schema-validation-json)). Thus, the schema type enforcement reduces the client code’s need to add more code to check returned data (from database) and cast to client’s desired type. 
+
+![Schema Example](img/schemaExample.png)
+*Figure ???: Example of a Schema*
+
+This allows for correctness of the data type that users receive from queries. However, as a result of having many cast checks, these checks cause a drop in performance as a result. Someone had an example of a [benchmark performance between MongoDB and Mongoose](https://bugwheels94.medium.com/performance-difference-in-mongoose-vs-mongodb-60be831c69ad), and found that MongoDB can be faster at times. This may be due to the architecture of Mongoose, where it calls from multiple sources like in `lib/cast` to `lib/modules`, etc. This would [spell trouble for larger datasets](https://towardsdatascience.com/the-drastic-mistake-of-using-mongoose-to-handle-your-big-data-a3c408e21a4c) because of the reliance on multiple modules at once. Mongoose would certainly take a performance hit with large data.
 
 ## Applying the Perspective
 
