@@ -244,7 +244,6 @@ In the `DivergentArrayError` that extends `MongooseError`, it has a `super(msg)`
 ### a: Mongoose Schema object creation
 Mongoose provides an abstracted interface allowing JavaScript programs to interact with MongoDB (such as create a table and define a schema on this table) using Mongoose syntax instead of the MongoDB native syntax. Thus, clients don’t need to understand the internals of MongoDB syntax, as long as they can use Mongoose syntax correctly. Since Mongoose translates and forwards client requests to MongoDB, Mongoose’s provided interface adheres to the Law of Demeter principle.
 
-
 ![Law of Demeter 1](img/Demeter-1.png)
 
 Here is an example of [database schema creation](https://mongoosejs.com/docs/guide.html) using Mongoose syntax
@@ -255,6 +254,10 @@ The MongoDB native syntax to create a table and [define a schema](https://docs.m
 
 In contrast, forJavaScript clients using mysql and mysql2 modules to interact with MySQL database, JavaScript clients need to use SQL query to perform database operations (highlighted part are SQL syntax, the rest of them are JavaScript syntax).
 ![](img/Screen Shot 2022-03-14 at 4.42.43 PM.png)
+
+## b: `lib/error/mongooseError.js` and Error classes (within the `lib/error` folder) that extend `MongooseError`.
+
+TO BE FILLED by Jason Xu
 
 ## Liskov Substitution Principle
 
@@ -276,6 +279,19 @@ TODO: Crosby need to add this part
 
 ## Composite Reuse Principle
 
+### a: `lib/cast/boolean.js`
+
 ![Composite Reuse Principle 1](img/CompReuse-1.png)
 
-Within `./lib/cast` folder, `boolean.js` uses an instance of `CastError` when it can’t convert a given to a boolean value. Since `boolean.js` does not inherit the `CastError` itself and the `CastError` can exist by itself without `boolean.js` codes, `boolean.js` follows the Composite Reuse Principle.
+Within the `./lib/cast` folder, boolean.js uses an instance of `CastError` (`throw new CastError('boolean', value, path);` ) when it can’t convert a given value to a boolean value. Since `boolean.js` does not inherit the `CastError` itself and the `CastError` can exist by itself without `boolean.js` codes, `boolean.js` follows the Composite Reuse Principle.
+
+### b: `lib/cast/string.js`
+
+![](img/image8.png)
+Within the `./lib/cast` folder, string.js also uses an instance of CastError (throw new CastError('string', value, path); ) when it can’t convert a given value to a String value. This error throwing behavior in string.js is similar to boolean.js .
+
+### c: `lib/schema.js`
+
+![](img/image25.png)
+
+Mongoose provides a `Schema.pick()` function allowing clients to “pick” a subset of schemas from the original schema. Mongoose will throw an instance of MongooseError object if the user does not pass an array in or the user's input is not in the original schema. Since this function does not inherit MongooseError but rather uses an instance of MongooseError, the `Schema.pick()` function favors composition over inheritance.
