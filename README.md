@@ -112,9 +112,9 @@ Side note on type casting and system predictability: the time consumption of typ
 
 ## Throughput
 
-MongoDB is a document-based database, indicating its data can be unstructured. If information (and its data type) within a database cannot be relied upon due to a lack of schema consistency, then it is more challenging for JavaScript client developers  to interact with MongoDB databases even via Mongoose. 
+MongoDB is a document-based database, indicating its data can be unstructured. If information (and its data type) within a database cannot be relied upon due to a lack of schema consistency, then it is more challenging for JavaScript client developers  to interact with MongoDB databases even via Mongoose.
 
-When using Mongoose, JavaScript client developers can set the database schema type while defining the table schema (such as declaring a String-typed column called `title`, in the below example). In contrast, developers need to explicitly define a typed-schema separately if they use native MongoDB syntax ([source](https://docs.mongodb.com/manual/core/schema-validation/#std-label-schema-validation-json)). Thus, the schema type enforcement reduces the client code’s need to add more code to check returned data (from database) and cast to client’s desired type. 
+When using Mongoose, JavaScript client developers can set the database schema type while defining the table schema (such as declaring a String-typed column called `title`, in the below example). In contrast, developers need to explicitly define a typed-schema separately if they use native MongoDB syntax ([source](https://docs.mongodb.com/manual/core/schema-validation/#std-label-schema-validation-json)). Thus, the schema type enforcement reduces the client code’s need to add more code to check returned data (from database) and cast to client’s desired type.
 
 ![Schema Example](img/schemaExample.png)
 *Figure ???: Example of a Schema*
@@ -131,7 +131,7 @@ This allows for correctness of the data type that users receive from queries. Ho
 - Otherwise, save data into database
 
 ![Performance Model](img/performance_model.png)
-*Figure ?: Benchmark Data referenced from (https://bit.ly/37whz7l) and (https://bit.ly/3MJlxK1)
+*Figure ?: Benchmark Data referenced from (https://bit.ly/37whz7l) and (https://bit.ly/3MJlxK1)*
 
 ### Identify the Performance-Critical Structure
 In the diagram above, the performance-critical components start at the **model** query where depending on the user’s request (reading or writing to data), it can impact the performance for the rest of the process flow. Latency is further introduced by the **casting processor** which takes in the user input data and checks if it can be casted to the enforced types in the **Data Schema**. Finally, the save() operation is executed where the row is added to the **MongoDB database** collection.
@@ -253,8 +253,14 @@ Here is an example of [database schema creation](https://mongoosejs.com/docs/gui
 The MongoDB native syntax to create a table and [define a schema](https://docs.mongodb.com/manual/core/schema-validation/#std-label-schema-validation-json) for this table is similar to this:
 ![](img/Screen Shot 2022-03-14 at 4.41.08 PM.png)
 
-In contrast, forJavaScript clients using mysql and mysql2 modules to interact with MySQL database, JavaScript clients need to use SQL query to perform database operations (highlighted part are SQL syntax, the rest of them are JavaScript syntax).
-![](img/Screen Shot 2022-03-14 at 4.42.43 PM.png)
+In contrast, for JavaScript clients using mysql and mysql2 modules to interact with MySQL database, JavaScript clients need to use SQL query to perform database operations (highlighted part are SQL syntax, the rest of them are JavaScript syntax).
+![app.get](img/Screen Shot 2022-03-14 at 4.42.43 PM.png)
+
+### b. Error classes that extend MongooseError
+
+![Law of Demeter 2](img/Demeter-2.png)
+
+Error-handling classes – such as CastError, DivergentArrayError, MissingSchemaError, DocumentNotFoundError – all extend the MongooseError object, and MongooseError extends the built-in JavaScript Error object. String, Boolean, and some other client classes interact with direct implementations of MongooseError rather than MongooseError itself, and these client classes do not need to know the behavior of MongooseError nor the built-in JavaScript Error Object. As a result, error-handling classes structures within Mongoose follow the Law of Demeter as well.
 
 ## Liskov Substitution Principle
 
