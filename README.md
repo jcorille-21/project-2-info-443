@@ -75,12 +75,12 @@ Mongoose library uses Mocha testing framework to test its codes. The testing fil
 ![Test Example](img/testExample.png)
 *Figure 3: Example of Testing Code*
 
-Many test files require the use of a common test file called `common.js`. This is located underneath the `/test` folder. Some outside dependencies include the `assert` library, the `collection` component located in the `/lib` folder, and some error validation (not pictured) which is located in the `error` component in `/lib`. Since `assert` is used, this means that Mongoose utilizes **unit testing** on individual components for their testing. 
+Many test files require the use of a common test file called `common.js`. This is located underneath the `/test` folder. Some outside dependencies include the `assert` library, the `collection` component located in the `/lib` folder, and some error validation (not pictured) which is located in the `error` component in `/lib`. Since `assert` is used, this means that Mongoose utilizes **unit testing** on individual components for their testing.
 
 ![common.js](img/testExample.png)
 *Figure 4: `common.js` Test File*
 
-This `common.js` test file contains many functions that other testing files use. Figure 4 above shows the first few lines of `common.js`. Because this test file is well-defined and has common functions for use in other test files, this would be a great starting point to figure out how to test code for Mongoose. 
+This `common.js` test file contains many functions that other testing files use. Figure 4 above shows the first few lines of `common.js`. Because this test file is well-defined and has common functions for use in other test files, this would be a great starting point to figure out how to test code for Mongoose.
 
 ![Testing Branches](img/differentBranches.png)
 *Figure 5: Mongoose Branches*
@@ -89,34 +89,29 @@ Additionally, many developers use their own branches to test code. As of the tim
 
 # Applied Perspective
 
-![Schema Example](img/schema.png)
-*Figure 6: Example of defined schema using Mongoose*
+While Mongoose provides many advantages that promote its prevalence among JavaScript programs that need to interact with MongoDB, we choose to analyze Mongoose library’s **Performance Perspective**. Because Mongoose handles many queries from MongoDB, the performance of the system is very important to consider when looking at the architecture. The query speed should be fast so users perform operations on MongoDB in a timely manner.
 
-It’s important to understand that MongoDB is a document-based database. In contrast to relational databases, this means that their data stored can be ‘unstructured’. While this offers benefits such as a more streamlined process of updating entries in the database, the lack of a rigid schema can make it difficult to enforce restrictions or specific data types allowed to be entered in the database.
+## Response Time
 
-Therefore, the main perspective that the Mongoose library falls under is the **Usability Perspective** by which it allows its users (Node.js developers) to more easily interact with the target system (MongoDB database) in order to work more effectively.  As it is an Object Document Mapper (ODM), it provides the functionality for its users to actually enforce that schema design. This then serves as an interface to the MongoDB database where those users can perform CRUD operations on entries in the collection while still abiding by said schema restrictions.
+## Throughput
 
-**Information Quality**.
-The concern is that if information within a database cannot be relied upon due to a lack of consistency, then the database cannot be utilized in a way that the developers intended for.
+## Applying the Perspective
 
-Thus, the schema type enforcement reduces the client code’s need to add more code (insert design pattern here) to check returned data (from database) and cast to client’s desired type.
+### Performance Model
+- User executes a query
+- Query goes through a cast file for processing
+- Cast file performs schema type checking and validation
+- Cast file then returns requested data if the query was a find operation
+- Otherwise, save data into database
 
-![SanitizeFilter](img/sanitize.png)
-*Figure 7: Example of sanitizeFilter function*
+![Performance Model](img/performance_model.png)
+*Figure ?: Benchmark Data referenced from (https://bit.ly/37whz7l) and (https://bit.ly/3MJlxK1)
 
-One example of this is that Mongoose’s library provides a `sanitizeFilter()` function that wraps any nested objects containing a property whose name starts with `$`(which are query operators) in a `$eq` instead. This prevents malicious users from executing query selector injection attacks and further ensures that the data passed in can be more trusted.
+### Identify the Performance-Critical Structure
+In the diagram above, the performance-critical components start at the **model** query where depending on the user’s request (reading or writing to data), it can impact the performance for the rest of the process flow. Latency is further introduced by the **casting processor** which takes in the user input data and checks if it can be casted to the enforced types in the **Data Schema**. Finally, the save() operation is executed where the row is added to the **MongoDB database** collection.
 
-**Usability with the Interface**.
-
-When developers are constantly working with their MongoDB database to fetch and insert data, Mongoose plays a pivotal role in making the process easier for them to interact with the interface. For instance, Mongoose allows users to easily define relationships between two schemas via the `type` and `ref` properties which point to the `ObjectId` of the specific schema it is related to.
-
-![Mongoose Validation](img/validator.png)
-*Figure 8: Custom Validation in Data Schemas within Mongoose*
-
-Mongoose also improves usability by allowing for custom, flexible data validation. The example above showcases how users can define a `validator` function where one can set the schema to only hold strings that meet the conditions of the defined regular expression when trying to insert data.
-
-Overall, the goal of this perspective in the Mongoose system is to allow developers to avoid the common pitfall of using inconsistent approaches to data entry validation when reading and writing to their databases.
-
+### Identify the Key Performance Metrics
+In the context of Mongoose, the key metrics to evaluate were reads/writes per second and the latency time. These metrics are the most important as read and write operations are the main ones that users perform with the system. For the benchmark, the Apache Benchmark suite was used where it would fire 150 requests per second from 4 concurrent users which would be a sufficient amount to see the extent of Mongoose’s throughput limit. From the benchmark it was found that Mongoose’s throughput was 583 reads/sec and 384 writes/sec. Its latency time was 1.71ms for reads and 2.60ms for writes. It should be noted that compared to the Native MongoDB driver, its performance was significantly better with a throughput of 1200 reads/sec with 0.83ms latency and 1128 writes/sec with 0.89ms latency. This is not surprising due to the validation and type-casting processing that Mongoose needs to perform between reading or writing the given data. The latency performance loss can be significant though as one benchmark used a schema with over 750 types to validate. It was found to take around 22-30 seconds to finally save it into the database. However, disabling validation reduced the entire operation to less than 1 second. Overall, Mongoose represents a tradeoff between performance and functionality. When using Mongoose, the developer will expect degraded performance but can then obtain more features such as data validation, sanitization from possible injection attacks, and consistency within an enforced schema.
 
 # Identify Styles and Patterns
 
