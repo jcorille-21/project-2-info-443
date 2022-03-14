@@ -12,6 +12,8 @@ People who maintain mongoose are a team or company called Automattic. This compa
 
 # Development View
 
+## Component Diagram
+
 ![Component Diagram](img/componentDiagram.png)
 *Figure 1: Components of Mongoose*
 
@@ -25,8 +27,9 @@ Initially the components were linked together by relationship, but this ended up
 
 |**Directory**|**Description**|
 |---|---|
+|`/lib`|Contains Mongoose source code and JavaScript files that start the program|
 |`/cast`|Converts primitives and objects to other types|
-|`/cursor`|Used for navigation|
+|`/cursor`|Used for table navigation|
 |`/driver`|Sets up connection information|
 |`/error`|Error handling functions|
 |`/helpers`|Helper functions for use in other modules|
@@ -36,10 +39,38 @@ Initially the components were linked together by relationship, but this ended up
 |`/types`|Defines objects that may be used in Mongoose|
 
 
+## Source Code Structures
+
+![Codeline Model](img/codelineModel.png)
+*Figure 2: Mongoose Source Code*
+
+Our codeline model shows **all the source code** in the Mongoose repository.  Again, we used **directories** for the codeline model because directories are more in line with the scope of Mongoose’s architecture rather than individual files. Many folders, like `/lib`, have many directories underneath them as well. This diagram is shown above. There is a table below that also describes the codeline model more thoroughly.
+
+-insert table here-
+
+## Testing and Configuration
+
+Mongoose library uses Mocha testing framework to test its codes. The testing files are located underneath the `test` folder, which is located in the root folder. There are many test files that Mongoose uses.
+
+![Test Example](img/testExample.png)
+*Figure 3: Example of Testing Code*
+
+Many test files require the use of a common test file called `common.js`. This is located underneath the `/test` folder. Some outside dependencies include the `assert` library, the `collection` component located in the `/lib` folder, and some error validation (not pictured) which is located in the `error` component in `/lib`. Since `assert` is used, this means that Mongoose utilizes **unit testing** on individual components for their testing. 
+
+![common.js](img/testExample.png)
+*Figure 4: `common.js` Test File*
+
+This `common.js` test file contains many functions that other testing files use. Figure 4 above shows the first few lines of `common.js`. Because this test file is well-defined and has common functions for use in other test files, this would be a great starting point to figure out how to test code for Mongoose. 
+
+![Testing Branches](img/differentBranches.png)
+*Figure 5: Mongoose Branches*
+
+Additionally, many developers use their own branches to test code. As of the time of fetching the repository, there are **over 100 different test branches**. Using branches allows developers to create pull requests for bug fixes and other improvements to the code. The Mongoose team would evaluate these pull requests and approve or deny changes if necessary.
+
 # Applied Perspective
 
 ![Schema Example](img/schema.png)
-*Figure 2: Example of defined schema using Mongoose*
+*Figure 6: Example of defined schema using Mongoose*
 
 It’s important to understand that MongoDB is a document-based database. In contrast to relational databases, this means that their data stored can be ‘unstructured’. While this offers benefits such as a more streamlined process of updating entries in the database, the lack of a rigid schema can make it difficult to enforce restrictions or specific data types allowed to be entered in the database.
 
@@ -51,7 +82,7 @@ The concern is that if information within a database cannot be relied upon due t
 Thus, the schema type enforcement reduces the client code’s need to add more code (insert design pattern here) to check returned data (from database) and cast to client’s desired type.
 
 ![SanitizeFilter](img/sanitize.png)
-*Figure 3: Example of sanitizeFilter function*
+*Figure 7: Example of sanitizeFilter function*
 
 One example of this is that Mongoose’s library provides a `sanitizeFilter()` function that wraps any nested objects containing a property whose name starts with `$`(which are query operators) in a `$eq` instead. This prevents malicious users from executing query selector injection attacks and further ensures that the data passed in can be more trusted.
 
@@ -60,7 +91,7 @@ One example of this is that Mongoose’s library provides a `sanitizeFilter()` f
 When developers are constantly working with their MongoDB database to fetch and insert data, Mongoose plays a pivotal role in making the process easier for them to interact with the interface. For instance, Mongoose allows users to easily define relationships between two schemas via the `type` and `ref` properties which point to the `ObjectId` of the specific schema it is related to.
 
 ![Mongoose Validation](img/validator.png)
-*Figure 4: Custom Validation in Data Schemas within Mongoose*
+*Figure 8: Custom Validation in Data Schemas within Mongoose*
 
 Mongoose also improves usability by allowing for custom, flexible data validation. The example above showcases how users can define a `validator` function where one can set the schema to only hold strings that meet the conditions of the defined regular expression when trying to insert data.
 
@@ -130,7 +161,8 @@ Web applications using Mongoose will communicate with Mongoose itself, rather di
 Also, the example used in Open Close Principle and Single Responsibility Principle follows the Law of Demeter, as the function using a Data Type processor (with respect to MongoDB Data Type) don’t need to know the actual implementation of processors themselves.
 
 ## Liskov Substitution Principle
-TODO
+
+For the **Liskov Substitution Principle**, there are two classes that promote this design pattern. These files are located in `lib/document.js`, which is the Document class, and `lib/types/subdocument.js`, which is the SubDocument class. See Figures ? and ? below.
 
 ## Composite Reuse Principle
 
