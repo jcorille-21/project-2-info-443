@@ -187,11 +187,29 @@ According to [documentation](https://mongoosejs.com/docs/tutorials/query_casting
 
 ## Open Close Principle
 
+### a: files/modules in `lib/schema` folder
 ![Open Closed Principle 1](img/OpenClosed-1.png)
 
-Instead of hard coding data types of Mongoose schemas, Mongoose developers opted for processing each (supported) data types in separate files/modules. They are being referenced in SchemaType(path, options, instance) located in ./lib/schematype.js . This allows MongoDB developers to create more files/modules to support new data type of MongoDB in future.
+Instead of hard-coding data types of Mongoose schemas, Mongoose developers opted for processing each (supported) data type in separate files/modules. They are being referenced in SchemaType(path, options, instance) located in `./lib/schematype.js` . This allows MongoDB developers to create more files/modules to support new data types of MongoDB in the future.
 
 ![Open Closed Principle 1](img/OpenClosed-2.png)
+
+### b: `./lib/error` directory,
+There are several error handling files that extend the `MongooseError` class , and the `MongooseError` class also extends the built-in JavaScript `Error` class. As a result, client classes (within Mongoose source code) can either use the `MongooseError` itself, or a more specific Error class that adds more behaviors to the `MongooseError` class, which is explained below.
+![](img/image35.png)
+
+Example 1: `lib/error/divergentArray.js`
+![](img/image12.png)
+
+In the DivergentArrayError that extends MongooseError, it has a super(msg) function that calls functions within MongooseError. This coding style follows an open-closed principle as DivergentArrayError extends MongooseError instead of modifying MongooseError behaviors.
+
+Example 2: `lib/error/cast.js`
+![](img/image9.png)
+Like DivergentArrayError, CastError also extends MongooseError functionality by adding CastError’s specific behaviors, instead of modifying MongooseError behaviors.
+
+### c: lib/cast/boolean.js
+![](img/image27.png)
+In the boolean.js file, one can modify which values should be interpreted as true or false by modifying content in two Set objects, without the need to modify the actual boolean casting logic. As a result, one may choose to add the equivalent of “true” or “false” in other languages (such as “oui” or “non” in French) by adding them in the convertToTrue and convertToFalse Sets.
 
 ## Single Responsibility Principle
 
