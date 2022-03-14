@@ -77,7 +77,12 @@ We believe that the mongoose applies the Layered architectural style. The users�
 The Mongoose itself follows an Facade pattern, as it translates between objects in JavaScript code and the representation of those objects in MongoDB. JavaScript developers can perform MongoDB operations by invoking Mongoose in typical JavaScript-like syntax rather than referencing MongoDB Shell syntax.
 ![Example of relationship of Mongoose and MongoDB](img/example.png)
 
+## Mediator Pattern
+According to [documentation](https://mongoosejs.com/docs/tutorials/query_casting.html), when Mongoose fails to cast the passed in data type to the enforced data type in the schema, it throws an instance of the `CastError` class. Rather than handling the error processing themselves, the `castString` and `castBoolean` functions pass in the type, value, and path to the CastError class which serves as the mediator between the components. The CastError class then takes in the passed arguments and eventually returns the respective error message to be displayed back to the client. Therefore, this communication between different components (lib/cast/string.js and lib/cast/boolean.js) and the central authority, `CastError` class showcases the Mediator Pattern.
 
+![Instance of CastError in "lib/cast/string.js"](img/CastErrorInstance.png)
+
+![CastError class in “/lib/error/cast.js”](img/CastError.png)
 
 # Architectural Assessment
 
