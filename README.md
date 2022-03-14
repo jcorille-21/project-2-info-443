@@ -109,6 +109,10 @@ Code snippet in `lib/cast/string.js`
 ![](img/image11.png)
 Side note on type casting and system predictability: the time consumption of type-casting processes is predictable, as all input values always go through <type>.js file to attempt casting value to the desired type (according to the type of schema). In addition, <type>.js files’ behaviors will not change during runtime, making type-casting operation stable (even though it reduces response time for Mongoose to insert values to MongoDB.
 
+## Response Time
+
+TO BE FILLED BY Jerome
+
 # Identify Styles and Patterns
 
 ## High-level architectural style
@@ -118,6 +122,31 @@ We believe that the mongoose applies the Layered architectural style. The users�
 ## Facade Pattern
 The Mongoose itself follows an Facade pattern, as it translates between objects in JavaScript code and the representation of those objects in MongoDB. JavaScript developers can perform MongoDB operations by invoking Mongoose in typical JavaScript-like syntax rather than referencing MongoDB Shell syntax.
 ![Example of relationship of Mongoose and MongoDB](img/example.png)
+
+## Decorator Pattern
+Decorator Pattern
+By default, Mongoose will call create “automatically calls createIndex for each defined index in your schema” when connecting users’ apps to the MongoDB database. Users can optionally pass { autoIndex: false } as the second parameter on mongoose.connect(...) to disable this default behavior. Since this object alters Mongoose’s default behavior, Mongoose’s provided interface adheres to the decorator pattern.
+
+Create a regular MongoDB connection:
+`mongoose.connect('mongodb://user:pass@localhost:port/database');`
+
+Create a MongoDB connection without having Mongoose call createIndex:
+`mongoose.connect('mongodb://user:pass@localhost:port/database', { autoIndex: false });
+// or
+mongoose.createConnection('mongodb://user:pass@localhost:port/database', { autoIndex: false });`
+
+Link: [https://mongoosejs.com/docs/guide.html](https://mongoosejs.com/docs/guide.html)
+
+##Iterator Pattern
+Within lib/cursor, QueryCursor.js exposes JavaScript’s Streams3 interface, allowing client programs to call .next() function to conditionally (or in batch) advance to the next row/document of MongoDB’s table/collection. Since client programs can utilize cursor interface to access content in MongoDB (a collection of objects) without any need to know Mongoose’s underlying implementation of cursor, Mongoose’s cursor interface is an example of Iterator pattern.
+
+[Cursor interface’s API documentation](https://mongoosejs.com/docs/api/query.html#query_Query-cursor)
+![](img/image21.png)
+
+Code snippet in `lib/cursor/QueryCursor.js`
+![](img/image34.png)
+And the function handling finding next element in the Collection
+![](img/image30.png)
 
 ## Mediator Pattern
 According to [documentation](https://mongoosejs.com/docs/tutorials/query_casting.html), when Mongoose fails to cast the passed in data type to the enforced data type in the schema, it throws an instance of the `CastError` class. Rather than handling the error processing themselves, the `castString` and `castBoolean` functions pass in the type, value, and path to the CastError class which serves as the mediator between the components. The CastError class then takes in the passed arguments and eventually returns the respective error message to be displayed back to the client. Therefore, this communication between different components (lib/cast/string.js and lib/cast/boolean.js) and the central authority, `CastError` class showcases the Mediator Pattern.
