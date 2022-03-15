@@ -96,6 +96,7 @@ While Mongoose provides many advantages that promote its prevalence among JavaSc
 When JavaScript developers uses Mongoose, they will define a typed schema by using `new mongoose.Schema({...})` API similar to the one below, whereas each field are typed.
 
 ![API Schema](img/image10.png)
+
 *Figure 6: API Schema*
 
 However, when JavaScript programs add data to MongoDB using Mongoose, Mongoose will first attempt to cast the provided input to the predefined schema types by going through a series of if-statement checks (which would take extra time), even though the user adds a correct-typed value. The concern of slowed response time due to type checking and casting is least useful for a large and clean dataset, according to [this blog post](https://towardsdatascience.com/the-drastic-mistake-of-using-mongoose-to-handle-your-big-data-a3c408e21a4c).
@@ -103,11 +104,13 @@ However, when JavaScript programs add data to MongoDB using Mongoose, Mongoose w
 For instance, if user pass in `false` (a boolean-typed value) at a table field that requires boolean value, according to lib/cast/boolean.js , Mongoose still need test whether `false` is within `Set([true, 'true', 1, '1', 'yes'])` to see whether false is a truthy value before testing whether this falsy value. As a result, Mongoose will have a higher response time to input a `false` value to the database compared to input a `true` value.
 
 ![](img/image15.png)
+
 *Figure 7: Code snippet within `lib/cast/boolean.js file`*
 
 As another example, when users want to insert a value to a String-typed field, Mongoose needs to first check whether the user passed in a null value or the user passed in the ID value of a document first, before checking whether this value can be casted to a String using the default `.toString()` method on an object. As a result, inserting an Object ID to a String-typed field takes less time (aka. reducing the database operations’ response time) compared to inserting a String-typed value to String-typed field; this issue is evident when we are inserting a large amount of data that is guaranteed to be String-typed (aka data is clean).
 
 ![](img/image11.png)
+
 *Figure 8: Code snippet in `lib/cast/string.js`*
 
 Side note on type casting and system predictability: the time consumption of type-casting processes is predictable, as all input values always go through <type>.js file to attempt casting value to the desired type (according to the type of schema). In addition, <type>.js files’ behaviors will not change during runtime, making type-casting operation stable, even though it reduces response time for Mongoose to insert values to MongoDB.
@@ -119,6 +122,7 @@ MongoDB is a document-based database, indicating its data can be unstructured. I
 When using Mongoose, JavaScript client developers can set the database schema type while defining the table schema (such as declaring a String-typed column called `title`, in the below example). In contrast, developers need to explicitly define a typed-schema separately if they use native MongoDB syntax ([source](https://docs.mongodb.com/manual/core/schema-validation/#std-label-schema-validation-json)). Thus, the schema type enforcement reduces the client code’s need to add more code to check returned data (from database) and cast to client’s desired type.
 
 ![Schema Example](img/schemaExample.png)
+
 *Figure 9: Example of a Schema*
 
 This allows for correctness of the data type that users receive from queries. However, as a result of having many cast checks, these checks cause a drop in performance as a result. Someone had an example of a [benchmark performance between MongoDB and Mongoose](https://bugwheels94.medium.com/performance-difference-in-mongoose-vs-mongodb-60be831c69ad), and found that MongoDB can be faster at times. This may be due to the architecture of Mongoose, where it calls from multiple sources like in `lib/cast` to `lib/modules`, etc. This would [spell trouble for larger datasets](https://towardsdatascience.com/the-drastic-mistake-of-using-mongoose-to-handle-your-big-data-a3c408e21a4c) because of the reliance on multiple modules at once. Mongoose would certainly take a performance hit with large data.
@@ -133,6 +137,7 @@ This allows for correctness of the data type that users receive from queries. Ho
 - Otherwise, save data into database
 
 ![Performance Model](img/performance_model.png)
+
 *Figure 10: Benchmark Data referenced from [source 1](https://blog.jscrambler.com/mongodb-native-driver-vs-mongoose-performance-benchmarks) and [source 2](https://github.com/Automattic/mongoose/issues/8751)*
 
 ### Identify the Performance-Critical Structure
@@ -149,6 +154,7 @@ From the benchmark, it was found that Mongoose’s throughput was 583 reads/sec 
 Mongoose applies the **Pipes and Filters architectural style**, where the flow of data is driven by data and the whole system is decomposed into components of data source, filters, pipes, and data sinks . The users’ query will select the input and Mongoose works as the filter, and the mongoDB is the result being fetch. 
 
 ![Example of Pipes and Filters architectural style](img/Pipe.png)
+
 *Figure 11: Example of Pipes and Filters architectural style*
 
 ## Decorator Pattern
@@ -159,32 +165,42 @@ Create a regular MongoDB connection:
 `mongoose.connect('mongodb://user:pass@localhost:port/database');`
 
 Create a MongoDB connection without having Mongoose call createIndex:
-`mongoose.connect('mongodb://user:pass@localhost:port/database', { autoIndex: false });
-// or
-mongoose.createConnection('mongodb://user:pass@localhost:port/database', { autoIndex: false });`
+
+`mongoose.connect('mongodb://user:pass@localhost:port/database', { autoIndex: false });`
+
+or
+
+`mongoose.createConnection('mongodb://user:pass@localhost:port/database', { autoIndex: false });`
 
 Link: [https://mongoosejs.com/docs/guide.html](https://mongoosejs.com/docs/guide.html)
 
 ## Iterator Pattern
-Within lib/cursor, QueryCursor.js exposes JavaScript’s Streams3 interface, allowing client programs to call .next() function to conditionally (or in batch) advance to the next row/document of MongoDB’s table/collection. Since client programs can utilize cursor interface to access content in MongoDB (a collection of objects) without any need to know Mongoose’s underlying implementation of cursor, Mongoose’s cursor interface is an example of Iterator pattern.
+Within lib/cursor, QueryCursor.js exposes JavaScript’s Streams3 interface, allowing client programs to call `.next()` function to conditionally (or in batch) advance to the next row/document of MongoDB’s table/collection. Since client programs can utilize cursor interface to iterate over content in MongoDB (a collection of objects) without any need to know Mongoose’s underlying implementation of cursor, Mongoose’s cursor interface is an example of Iterator pattern.
 
 ![](img/image21.png)
+
 *Figure 12: [Cursor interface’s API documentation](https://mongoosejs.com/docs/api/query.html#query_Query-cursor)*
 
+Code snippet in `lib/cursor/QueryCursor.js`
+
 ![](img/image34.png)
+
 *Figure 13: Code snippet in `lib/cursor/QueryCursor.js`*
 
 ![](img/image30.png)
+
 *Figure 14: Function Handling finding next Element in the Collection*
 
 ## Mediator Pattern
 
-According to [documentation](https://mongoosejs.com/docs/tutorials/query_casting.html), when Mongoose fails to cast the passed in data type to the enforced data type in the schema, it throws an instance of the `CastError` class. Rather than handling the error processing themselves, the `castString` and `castBoolean` functions pass in the type, value, and path to the CastError class which serves as the mediator between the components. The CastError class then takes in the passed arguments and eventually returns the respective error message to be displayed back to the client. Therefore, this communication between different components (lib/cast/string.js and lib/cast/boolean.js) and the central authority, `CastError` class showcases the Mediator Pattern.
+According to [documentation](https://mongoosejs.com/docs/tutorials/query_casting.html), when Mongoose fails to cast the passed in data type to the enforced data type in the schema, it throws an instance of the `CastError` class. Rather than handling the error processing themselves, the `castString` and `castBoolean` functions pass in the type, value, and path to the `CastError` class which serves as the mediator between the components. The `CastError` class then takes in the passed arguments and eventually returns the respective error message to be displayed back to the client. Therefore, this communication between different components (`lib/cast/string.js` and `lib/cast/boolean.js`) and the central authority, `CastError` class showcases the Mediator Pattern.
 
 ![Instance of CastError in "lib/cast/string.js"](img/CastErrorInstance.png)
+
 *Figure 15: Instance of CastError in "lib/cast/string.js"*
 
 ![CastError class in “/lib/error/cast.js”](img/CastError.png)
+
 *Figure 16: CastError class in "lib/error/cast.js"*
 
 ## Strategy Pattern
@@ -196,12 +212,16 @@ According to the [documentation](https://mongoosejs.com/docs/validation.html#val
 In the source code itself, there are [some cast type conversions](https://mongoosejs.com/docs/schematypes.html). This can be seen in the below images, where a boolean converter converts commonly-used boolean values (but are not represented as a boolean data type value) into `true` or `false`.
 
 ![lib/cast/boolean.js example](img/castBooleanDotJs.png)
+
 *Figure 17: Example of `lib/cast/boolean.js` (converts boolean-like string and number to true or false)*
 
 The **strategy pattern** states that a family of algorithms should be encapsulated and interchangeable so the algorithms would vary for the clients that use them. Since clients may expect `true` or `false` values from varying strings, the logic would come from `boolean.js` and convert strings into boolean values. This follows a specific approach to casting for boolean values. Other methods exist for casting of other types such as strings and integers. This follows the **strategy pattern** closely because of multiple algorithms being made for similar functions.
 
 ![lib/schema/boolean.js example](img/schemaBooleanDotJs.png)
+
 *Figure 18: Example of Strategy Pattern being put into place for booleans, `lib/schema/boolean.js`*
+
+Likewise, if user wants to input data to a String-typed field, Mongoose will call `lib/cast/string.js` that handles casting values to String, of which Mongoose is using a different (casting) strategy.
 
 # Architectural Assessment
 
@@ -209,33 +229,39 @@ The **strategy pattern** states that a family of algorithms should be encapsulat
 
 ### a: files/modules in `lib/schema` folder
 ![Open Closed Principle 1](img/OpenClosed-1.png)
+
 *Figure 19: `lib/schema` folder*
 
 Instead of hard-coding data types of Mongoose schemas, Mongoose developers opted for processing each (supported) data type in separate files/modules. They are being referenced in SchemaType(path, options, instance) located in `./lib/schematype.js` . This allows MongoDB developers to create more files/modules to support new data types of MongoDB in the future.
 
 ![Open Closed Principle 1](img/OpenClosed-2.png)
+
 *Figure 20: `SchemaType` function*
 
 ### b: `./lib/error` directory,
 There are several error handling files that extend the `MongooseError` class , and the `MongooseError` class also extends the built-in JavaScript `Error` class. As a result, client classes (within Mongoose source code) can either use the `MongooseError` itself, or a more specific Error class that adds more behaviors to the `MongooseError` class, which is explained below.
 
 ![](img/image35.png)
+
 *Figure 21: `MongooseError` class*
 
 Example 1: `lib/error/divergentArray.js`
 ![](img/image12.png)
+
 *Figure 22: `DivergentArrayError` class*
 
 In the DivergentArrayError that extends MongooseError, it has a super(msg) function that calls functions within MongooseError. This coding style follows an open-closed principle as DivergentArrayError extends MongooseError instead of modifying MongooseError behaviors.
 
 Example 2: `lib/error/cast.js`
 ![](img/image9.png)
+
 *Figure 23: `CastError` class*
 
 Like DivergentArrayError, CastError also extends MongooseError functionality by adding CastError’s specific behaviors, instead of modifying MongooseError behaviors.
 
 ### c: `lib/cast/boolean.js`
 ![](img/image27.png)
+
 *Figure 24: `castBoolean` function*
 
 In the boolean.js file, one can modify which values should be interpreted as true or false by modifying content in two Set objects, without the need to modify the actual boolean casting logic. As a result, one may choose to add the equivalent of “true” or “false” in other languages (such as “oui” or “non” in French) by adding them in the convertToTrue and convertToFalse Sets.
