@@ -29,18 +29,18 @@ Provided interfaces include modules that need the module to work. Going back to 
 
 Initially the components were linked together by relationship, but this ended up being very messy for a model. The components are in the /lib directory, which is the directory at the very top. The /lib directory contains all folders underneath. The folders are listed below:
 
-|**Directory**|**Description**|
-|---|---|
-|`/lib`|Contains Mongoose source code and JavaScript files that start the program|
-|`/cast`|Converts primitives and objects to other types|
-|`/cursor`|Used for table navigation|
-|`/driver`|Sets up connection information|
-|`/error`|Error handling functions|
-|`/helpers`|Helper functions for use in other modules|
-|`/options`|Populates interface with changeable options|
-|`/plugins`|Additional options users may install|
-|`/schema`|Defines a MongoDB schema, which is like a table in SQL|
-|`/types`|Defines objects that may be used in Mongoose|
+| **Directory** | **Description**                                                           |
+|---------------|---------------------------------------------------------------------------|
+| `/lib`        | Contains Mongoose source code and JavaScript files that start the program |
+| `/cast`       | Converts primitives and objects to other types                            |
+| `/cursor`     | Used for table navigation                                                 |
+| `/driver`     | Sets up connection information                                            |
+| `/error`      | Error handling functions                                                  |
+| `/helpers`    | Helper functions for use in other modules                                 |
+| `/options`    | Populates interface with changeable options                               |
+| `/plugins`    | Additional options users may install                                      |
+| `/schema`     | Defines a MongoDB schema, which is like a table in SQL                    |
+| `/types`      | Defines objects that may be used in Mongoose                              |
 
 
 ## Source Code Structures
@@ -54,7 +54,7 @@ Our codeline model shows **all the source code** in the Mongoose repository.  Ag
 |-------------|-------------------|-----------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | /           |                   |                       | Contains everything of the Mongoose module, including library codes, test suites, documentations, example programs, and more.                                                                                               |
 |             | .github/          |                       | Github repository-specific content, showing project funding channels, issue template, and pull request templates                                                                                                            |
-|             |                   | workflow/             | Contain Github workflow files, such as automate running Mocha tests in the test/ directory                                                                                                                                  |
+|             |                   | workflow/             | Contain Github workflow files, such as automate running Mocha tests in the `test/` directory                                                                                                                                |
 |             | benchmarks/       |                       | Performance benchmark JavaScript programs for testing Mongoose framework’s performance (in-practice runtime).                                                                                                               |
 |             | docs/             |                       | All website files (HTML, CSS, JavaScript) for Mongoose documentation site: https://mongoosejs.com/ , applicable to Mongoose 6.2.x, 5.13.x, 4.13.x versions.                                                                 |
 |             |                   | 2.7.x/ to 3.5.x/      | Contains website files for documentations of old versions of Mongoose.                                                                                                                                                      |
@@ -70,7 +70,7 @@ Our codeline model shows **all the source code** in the Mongoose repository.  Ag
 
 ## Testing and Configuration
 
-Mongoose library uses Mocha testing framework to test its codes. The testing files are located underneath the `test` folder, which is located in the root folder. There are many test files that Mongoose uses.
+Mongoose library uses `Mocha` testing framework to test its codes. The testing files are located underneath the `test` folder, which is located in the root folder. Each named test file represent a module/feature being tested on (such as schema-related operations or special handling on specific data type values). This group attempted to run Mocha tests, either via IDE or command line, but only David Xie can successfully initiate Mocha tests via his WebStorm IDE; other group members did not observe any output (or experience non-test related errors) while attempting to run test files in VS Code IDE nor Node.js command line.
 
 ![Test Example](img/testExample.png)
 *Figure 3: Example of Testing Code*
@@ -313,3 +313,22 @@ Within the `./lib/cast` folder, string.js also uses an instance of CastError (th
 ![](img/image25.png)
 
 Mongoose provides a `Schema.pick()` function allowing clients to “pick” a subset of schemas from the original schema. Mongoose will throw an instance of MongooseError object if the user does not pass an array in or the user's input is not in the original schema. Since this function does not inherit MongooseError but rather uses an instance of MongooseError, the `Schema.pick()` function favors composition over inheritance.
+
+# System Improvement
+
+## Refactoring:
+- `lib/error/serverSelection.js` : clarify constant naming for error messages.
+- `lib/schema.js` : in `Schema._clone()` function in line 336, group similar operations (within this function) together, use ES6 spread operators to favor modern JavaScript syntax.
+
+## Bug fix:
+- [Github Issue 11515](https://github.com/Automattic/mongoose/issues/11515)
+- `lib/helpers/pluralize.js` : use pluralize.js library (MIT-licensed) to rebase pluralization and irregular verb rules from pluralization.js to what’s currently in `Mongoose.js`, adjust Mongoose’s pluralize(str) function allowing developers to easily merge upstream pluralization rule changes on pluralization.js module to `Mongoose.js` .
+- `test/helpers/pluralize.test.js` : writing test cases according to pluralization scenarios on the original issue post.
+  - six => sixes
+  - sex => sexes
+  - vertex => vertices
+  - Index => _indices_ (David Xie's fix)
+
+## Feature improvement:
+- `lib/cast/boolean.js` : Speed up in-practice runtime of boolean casting when the input values are clean (aka they are already a boolean value). In this case, no further data validation/processing should be there, and no `Set` initialization is needed (as (repeatedly) creating a `new` instance of object takes time)
+  - `test/schema.boolean.test.js` : Writing more test cases to validate my code change does not break original boolean-casting features. New tests include whether `boolean.js` can cast non-boolean truthy value to true, and whether `boolean.js` throws an error when the user is trying to insert a non-boolean value to a boolean-typed schema field.
