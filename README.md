@@ -19,6 +19,7 @@ People who maintain mongoose are a team or company called Automattic. This compa
 ## Component Diagram
 
 ![Component Diagram](img/componentDiagram.png)
+
 *Figure 1: Components of Mongoose*
 
 We created a component diagram that details relationships between other components. Our components scope is limited to **directories/folders**. Our reasoning is that there are too many code files to individually analyze, so breaking it up into directories as components felt like the natural thing to do. In our diagram, each component has a **required interface** section and a **provided interface** section.
@@ -46,6 +47,7 @@ Initially the components were linked together by relationship, but this ended up
 ## Source Code Structures
 
 ![Codeline Model](img/codelineModel.png)
+
 *Figure 2: Mongoose Source Code*
 
 Our codeline model shows **all the source code** in the Mongoose repository.  Again, we used **directories** for the codeline model because directories are more in line with the scope of Mongoose’s architecture rather than individual files. Many folders, like `/lib`, have many directories underneath them as well. This diagram is shown above. There is a table below that also describes the codeline model more thoroughly.
@@ -73,16 +75,19 @@ Our codeline model shows **all the source code** in the Mongoose repository.  Ag
 Mongoose library uses Mocha testing framework to test its codes. The testing files are located underneath the `test` folder, which is located in the root folder. Each named test file represent a module/feature being tested on (such as schema-related operations or special handling on specific data type values). This group attempted to run Mocha tests, either via IDE or command line, but only David Xie can successfully initiate Mocha tests via his WebStorm IDE by clicking on its run buttons; other group members did not observe any output (or experience non-test related errors) while attempting to run test files in VS Code IDE nor Node.js command line.
 
 ![Test Example](img/testExample.png)
+
 *Figure 3: Example of Testing Code*
 
 Many test files require the use of a common test file called `common.js`. This is located underneath the `/test` folder. Some outside dependencies include the `assert` library, the `collection` component located in the `/lib` folder, and some error validation (not pictured) which is located in the `error` component in `/lib`. Since `assert` is used, this means that Mongoose utilizes **unit testing** on individual components for their testing.
 
-![common.js](img/testExample.png)
+![common.js](img/Screen Shot 2022-03-14 at 9.52.26 PM.png)
+
 *Figure 4: `common.js` Test File*
 
 This `common.js` test file contains many functions that other testing files use. Figure 4 above shows the first few lines of `common.js`. Because this test file is well-defined and has common functions for use in other test files, this would be a great starting point to figure out how to test code for Mongoose.
 
 ![Testing Branches](img/differentBranches.png)
+
 *Figure 5: Mongoose Branches*
 
 Additionally, many developers use their own branches to test code. As of the time of fetching the repository, there are **over 100 different test branches**. Using branches allows developers to create pull requests for bug fixes and other improvements to the code. The Mongoose team would evaluate these pull requests and approve or deny changes if necessary.
