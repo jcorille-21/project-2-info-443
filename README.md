@@ -145,10 +145,6 @@ In the context of Mongoose, the key metrics to evaluate were reads/writes per se
 We believe that the mongoose applies the Layered architectural style. The users’ script works as the presentational layer and the mongoose works as the business layer, and the mongoDB is the data layer.
 ![Example of Layered architectural style](img/exampleOfLayered.png)
 
-## Facade Pattern
-The Mongoose itself follows an Facade pattern, as it translates between objects in JavaScript code and the representation of those objects in MongoDB. JavaScript developers can perform MongoDB operations by invoking Mongoose in typical JavaScript-like syntax rather than referencing MongoDB Shell syntax.
-![Example of relationship of Mongoose and MongoDB](img/example.png)
-
 ## Decorator Pattern
 Decorator Pattern
 By default, Mongoose will call create “automatically calls createIndex for each defined index in your schema” when connecting users’ apps to the MongoDB database. Users can optionally pass { autoIndex: false } as the second parameter on mongoose.connect(...) to disable this default behavior. Since this object alters Mongoose’s default behavior, Mongoose’s provided interface adheres to the decorator pattern.
