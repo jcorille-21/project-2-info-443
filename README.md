@@ -51,7 +51,7 @@ With the Usability Perspective in mind, one of the main concerns that Mongoose t
 # Identify Styles and Patterns
 
 ## High-level architectural style
-We believe that the mongoose applies the Layered architectural style. The users’ script works as the presentational layer and the mongoose works as the business layer, and the mongoDB is the data layer.
+Mongoose applies the Pipes and the **Filters architectural style**, where the flow of data is driven by data and the whole system is decomposed into components of data source, filters, pipes, and data sinks . The users’ query will select the input  and Mongoose works as the filter, and the mongoDB is the result being fetch. 
 ![Example of Layered architectural style](img/exampleOfLayered.png)
 
 ## Facade Pattern
@@ -85,12 +85,10 @@ created_date: Date
 
 ## Dependency Inversion Principle
 
-Within `./lib/error` directory, there are several error handling files that extends `MongooseError` class , and `MongooseError` class also extends the built-in JavaScript `Error` class.
-![Dependency Inversion Principle 1](img/DepInv-1.png)
+a: `.lib/cast.js`
+![Dependency Inversion Principle 2](img/exampleOfDependcy.png)
+Within `.lib/cast.js`, the function `_cast(val, numbertype, context)` assigns `numbertype.castForQuery({ val: item, context: context })` function to val[nkey] . However, depending on the content of numbertype, the client who invoke `castForQuery()` method will conditionally invoke different implementations of `castForQuery()` based on the schema data type (such as `castForQuery()` of `.lib/schema/date.js` or `.lib/schema/boolean.js`). Hence cast.js doesn't need to consider which implementation of `castForQuery()` should cast.js call as long as cast.js knows the data type of value that needs to be casted. Thus cast.js adheres to the dependency inversion principle.
 
-![Dependency Inversion Principle 2](img/DepInv-2.png)
-
-In the `DivergentArrayError` that extends `MongooseError`, it has a `super(msg)` function that calls the `MongooseError` super class. This coding style follows dependency inversion principle, because developers can add new (more specific) `MongooseError` class files that extends `MongooseError`.
 
 ## Interface Segregation Principle
 TODO
@@ -104,10 +102,19 @@ Web applications using Mongoose will communicate with Mongoose itself, rather di
 Also, the example used in Open Close Principle and Single Responsibility Principle follows the Law of Demeter, as the function using a Data Type processor (with respect to MongoDB Data Type) don’t need to know the actual implementation of processors themselves.
 
 ## Liskov Substitution Principle
-TODO
+b: checkRequired functions in several .js files within `.lib/schema`, and checkRequired function of `.lib/schematype.js`
+checkRequired function in `.lib/schematype.js`
+
+![checkRequired function in lib/schematype.js](img/Liskov-Substitution.png)
+
+Within the `.lib/schema/operators` folder, boolean.js and number.js all use the same  checkRequired function in lib/schematype.js. Thus this match the *Liskov Substitution Principle* because these “SubDocuments” replace and override the instance from the schematype class. For example, in number.js, it overrides the function the required validator uses to check whether a **string value** passes the ‘required’ check. While in boolean.js, they override the function the required validator uses to check whether a **boolean value** passes the ‘required’ check.
+
+![Code of lib/schema/boolean.js](img/Liskov-Substitution.png)
+![Code of lib/schema/boolean.js](img/Liskov-Substitution1.png)
+![Code of lib/schema/number.js](img/Liskov-Substitution2.png)
 
 ## Composite Reuse Principle
 
-![Composite Reuse Principle 1](img/CompReuse-1.png)
+
 
 Within `./lib/cast` folder, `boolean.js` uses an instance of `CastError` when it can’t convert a given to a boolean value. Since `boolean.js` does not inherit the `CastError` itself and the `CastError` can exist by itself without `boolean.js` codes, `boolean.js` follows the Composite Reuse Principle.
