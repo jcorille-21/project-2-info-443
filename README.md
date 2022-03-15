@@ -195,11 +195,11 @@ According to [documentation](https://mongoosejs.com/docs/tutorials/query_casting
 
 ![Instance of CastError in "lib/cast/string.js"](img/CastErrorInstance.png)
 
-*Figure 15: Instance of CastError in "lib/cast/string.js"*
+*Figure 15: Instance of CastError in `lib/cast/string.js`*
 
 ![CastError class in “/lib/error/cast.js”](img/CastError.png)
 
-*Figure 16: CastError class in "lib/error/cast.js"*
+*Figure 16: CastError class in `lib/error/cast.js`*
 
 ## Strategy Pattern
 
@@ -230,14 +230,14 @@ Likewise, if user wants to input data to a String-typed field, Mongoose will cal
 
 *Figure 19: `lib/schema` folder*
 
-Instead of hard-coding data types of Mongoose schemas, Mongoose developers opted for processing each (supported) data type in separate files/modules. They are being referenced in SchemaType(path, options, instance) located in `./lib/schematype.js` . This allows MongoDB developers to create more files/modules to support new data types of MongoDB in the future.
+Instead of hard-coding data types of Mongoose schemas, Mongoose developers opted for processing each (supported) data type in separate files/modules. They are being referenced in `SchemaType(path, options, instance)` located in `./lib/schematype.js` . This allows MongoDB developers to create more files/modules to support new data types of MongoDB in the future.
 
 ![Open Closed Principle 1](img/OpenClosed-2.png)
 
 *Figure 20: `SchemaType` function*
 
 ### b: `./lib/error` directory,
-There are several error handling files that extend the `MongooseError` class , and the `MongooseError` class also extends the built-in JavaScript `Error` class. As a result, client classes (within Mongoose source code) can either use the `MongooseError` itself, or a more specific Error class that adds more behaviors to the `MongooseError` class, which is explained below.
+There are several error handling files that extend the `MongooseError` class , and the `MongooseError` class also extends the built-in JavaScript `Error` class. As a result, client classes (within Mongoose source code) can either use the `MongooseError` itself, or a more specific `Error` class that adds more behaviors to the `MongooseError` class, which is explained below.
 
 ![](img/image35.png)
 
@@ -248,21 +248,21 @@ Example 1: `lib/error/divergentArray.js`
 
 *Figure 22: `DivergentArrayError` class*
 
-In the DivergentArrayError that extends MongooseError, it has a super(msg) function that calls functions within MongooseError. This coding style follows an open-closed principle as DivergentArrayError extends MongooseError instead of modifying MongooseError behaviors.
+In the `DivergentArrayError` that extends `MongooseError`, it has a `super(msg)` function that calls functions within `MongooseError`. This coding style follows an open-closed principle as `DivergentArrayError` **extends** `MongooseError` instead of modifying `MongooseError` behaviors.
 
 Example 2: `lib/error/cast.js`
 ![](img/image9.png)
 
 *Figure 23: `CastError` class*
 
-Like DivergentArrayError, CastError also extends MongooseError functionality by adding CastError’s specific behaviors, instead of modifying MongooseError behaviors.
+Like `DivergentArrayError`, `CastError` also extends `MongooseError` functionality by adding `CastError`’s specific behaviors, instead of modifying `MongooseError` behaviors.
 
 ### c: `lib/cast/boolean.js`
 ![](img/image27.png)
 
 *Figure 24: `castBoolean` function*
 
-In the boolean.js file, one can modify which values should be interpreted as true or false by modifying content in two Set objects, without the need to modify the actual boolean casting logic. As a result, one may choose to add the equivalent of “true” or “false” in other languages (such as “oui” or “non” in French) by adding them in the convertToTrue and convertToFalse Sets.
+In the `boolean.js` file, one can modify which values should be interpreted as `true` or `false` by modifying content in two `Set` objects, without the need to modify the actual boolean casting logic. As a result, one may choose to add the equivalent of “true” or “false” in other languages (such as “oui” or “non” in French) by adding them in the `convertToTrue` and `convertToFalse` `Sets`.
 
 ## Single Responsibility Principle
 ### a: `lib/schema` folder
@@ -272,29 +272,34 @@ In the boolean.js file, one can modify which values should be interpreted as tru
 *Figure 25: `lib/schema/operators` directory*
 
 JavaScript files within `./lib/schema` handles data type (of the corresponding MongoDB schema types) individually (each JavaScript file handles own MongoDB data type). For instance, code handling String data type don’t need to know the code handling Date data type. Clients of Mongoose will define MongoDB schemas in a fashion similar to this:
-`const postSchema = new mongoose.Schema({
-url: String,
-description: String,
-username: String,
-likes: [String],
-created_date: Date
-})`
+```
+const postSchema = new mongoose.Schema({
+  url: String,
+  description: String,
+  username: String,
+  likes: [String],
+  created_date: Date
+  })
+```
 
-### b: `lib/error/mongooseError.js` and Error classes (within the lib/error folder) that extend MongooseError.
+### b: `lib/error/mongooseError.js` and Error classes (within the lib/error folder) that extend `MongooseError`.
 ![](img/image35.png)
 
 *Figure 26: `MongooseError` class*
 
-MongooseError’s sole responsibility is to throw an Error (built-in JavaScript Error) object with the name of “Mongoose”, allowing client program developers to easily distinguish error from Mongoose or other external modules (dependencies) when debugging their JavaScript programs.
+`MongooseError`’s sole responsibility is to throw an `Error` (built-in JavaScript `Error`) object with the name of “Mongoose”, allowing client program developers to easily distinguish error from Mongoose or other external modules (dependencies) when debugging their JavaScript programs.
 
 ## Dependency Inversion Principle
 
 a: `.lib/cast.js`
+
+![Dependency Inversion Principle 2](img/Pipe.png)
+
 ![Dependency Inversion Principle 2](img/exampleOfDepency.png)
 
 *Figure 27: `_cast` function*
 
-Within `.lib/cast.js`, the function `_cast(val, numbertype, context)` assigns `numbertype.castForQuery({ val: item, context: context })` function to val[nkey] . However, depending on the content of numbertype, the client who invoke `castForQuery()` method will conditionally invoke different implementations of `castForQuery()` based on the schema data type (such as `castForQuery()` of `.lib/schema/date.js` or `.lib/schema/boolean.js`). Hence cast.js doesn't need to consider which implementation of `castForQuery()` should cast.js call as long as cast.js knows the data type of value that needs to be casted. Thus cast.js adheres to the dependency inversion principle.
+Within `.lib/cast.js`, the function `_cast(val, numbertype, context)` assigns `numbertype.castForQuery({ val: item, context: context })` function to **val[nkey]** . However, depending on the content of numbertype, the client who invoke `castForQuery()` method will conditionally invoke different implementations of `castForQuery()` based on the schema data type (such as `castForQuery()` of `.lib/schema/date.js` or `.lib/schema/boolean.js`). Hence cast.js doesn't need to consider which implementation of `castForQuery()` should cast.js call as long as cast.js knows the data type of value that needs to be casted. Thus cast.js adheres to the dependency inversion principle.
 
 
 ## Principle of Least Knowledge (Law of Demeter)
