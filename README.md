@@ -163,7 +163,7 @@ mongoose.createConnection('mongodb://user:pass@localhost:port/database', { autoI
 
 Link: [https://mongoosejs.com/docs/guide.html](https://mongoosejs.com/docs/guide.html)
 
-##Iterator Pattern
+## Iterator Pattern
 Within lib/cursor, QueryCursor.js exposes JavaScript’s Streams3 interface, allowing client programs to call .next() function to conditionally (or in batch) advance to the next row/document of MongoDB’s table/collection. Since client programs can utilize cursor interface to access content in MongoDB (a collection of objects) without any need to know Mongoose’s underlying implementation of cursor, Mongoose’s cursor interface is an example of Iterator pattern.
 
 [Cursor interface’s API documentation](https://mongoosejs.com/docs/api/query.html#query_Query-cursor)
@@ -175,6 +175,7 @@ And the function handling finding next element in the Collection
 ![](img/image30.png)
 
 ## Mediator Pattern
+
 According to [documentation](https://mongoosejs.com/docs/tutorials/query_casting.html), when Mongoose fails to cast the passed in data type to the enforced data type in the schema, it throws an instance of the `CastError` class. Rather than handling the error processing themselves, the `castString` and `castBoolean` functions pass in the type, value, and path to the CastError class which serves as the mediator between the components. The CastError class then takes in the passed arguments and eventually returns the respective error message to be displayed back to the client. Therefore, this communication between different components (lib/cast/string.js and lib/cast/boolean.js) and the central authority, `CastError` class showcases the Mediator Pattern.
 
 ![Instance of CastError in "lib/cast/string.js"](img/CastErrorInstance.png)
@@ -182,6 +183,22 @@ According to [documentation](https://mongoosejs.com/docs/tutorials/query_casting
 
 ![CastError class in “/lib/error/cast.js”](img/CastError.png)
 *CastError class in "lib/error/cast.js"*
+
+## Strategy Pattern
+
+When declaring the table schema in Mongoose, Mongoose will accept commonly-used JavaScript data types such as `String`, `Number`, and `Boolean` and translate them into MongoDB schema types. This allows users to directly use JavaScript methods for this JavaScript data type and save the result to MongoDB. 
+
+According to documentation, before running schema validators, Mongoose attempts to **coerce values to the correct type**. This process is called casting the document. If casting fails for a given path, the `error.errors` object will contain a `CastError` object.
+
+In the source code itself, there are some cast type conversions. This can be seen in the below images, where a boolean converter converts commonly-used boolean values (but are not represented as a boolean data type value) into `true` or `false`.
+
+![lib/cast/boolean.js example](img/castBooleanDotJs.png)
+*Figure ?: Example of `lib/cast/boolean.js` (converts boolean-like string and number to true or false)*
+
+The **strategy pattern** states that a family of algorithms should be encapsulated and interchangeable so the algorithms would vary for the clients that use them. Since clients may expect `true` or `false` values from varying strings, the logic would come from `boolean.js` and convert strings into boolean values. This follows a specific approach to casting for boolean values. Other methods exist for casting of other types such as strings and integers. This follows the **strategy pattern** closely because of multiple algorithms being made for similar functions.
+
+![lib/schema/boolean.js example](img/schemaBooleanDotJs.png)
+*Figure ??: Example of Strategy Pattern being put into place for booleans, `lib/schema/boolean.js`*
 
 # Architectural Assessment
 
