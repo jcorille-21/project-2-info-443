@@ -186,7 +186,7 @@ According to [documentation](https://mongoosejs.com/docs/tutorials/query_casting
 
 ## Strategy Pattern
 
-When declaring the table schema in Mongoose, Mongoose will accept commonly-used JavaScript data types such as `String`, `Number`, and `Boolean` and translate them into MongoDB schema types. This allows users to directly use JavaScript methods for this JavaScript data type and save the result to MongoDB. 
+When declaring the table schema in Mongoose, Mongoose will accept commonly-used JavaScript data types such as `String`, `Number`, and `Boolean` and translate them into MongoDB schema types. This allows users to directly use JavaScript methods for this JavaScript data type and save the result to MongoDB.
 
 According to documentation, before running schema validators, Mongoose attempts to **coerce values to the correct type**. This process is called casting the document. If casting fails for a given path, the `error.errors` object will contain a `CastError` object.
 
@@ -256,7 +256,7 @@ Within `./lib/error` directory, there are several error handling files that exte
 
 In the `DivergentArrayError` that extends `MongooseError`, it has a `super(msg)` function that calls the `MongooseError` super class. This coding style follows dependency inversion principle, because developers can add new (more specific) `MongooseError` class files that extends `MongooseError`.
 
-## Principle of Least Knowledge (Law of Demeter)  (from INFO 443 OOP Principles lecture)
+## Principle of Least Knowledge (Law of Demeter)
 
 ### a: Mongoose Schema object creation
 Mongoose provides an abstracted interface allowing JavaScript programs to interact with MongoDB (such as create a table and define a schema on this table) using Mongoose syntax instead of the MongoDB native syntax. Thus, clients don’t need to understand the internals of MongoDB syntax, as long as they can use Mongoose syntax correctly. Since Mongoose translates and forwards client requests to MongoDB, Mongoose’s provided interface adheres to the Law of Demeter principle.
@@ -276,7 +276,7 @@ In contrast, for JavaScript clients using mysql and mysql2 modules to interact w
 
 ![Law of Demeter 2](img/Demeter-2.png)
 
-Error-handling classes – such as CastError, DivergentArrayError, MissingSchemaError, DocumentNotFoundError – all extend the MongooseError object, and MongooseError extends the built-in JavaScript Error object. String, Boolean, and some other client classes interact with direct implementations of MongooseError rather than MongooseError itself, and these client classes do not need to know the behavior of MongooseError nor the built-in JavaScript Error Object. As a result, error-handling classes structures within Mongoose follow the Law of Demeter as well.
+Error-handling classes – such as `CastError`, `DivergentArrayError`, `MissingSchemaError`, `DocumentNotFoundError` – all extend the `MongooseError` object, and `MongooseError` extends the built-in JavaScript Error object. String, Boolean, and some other client classes interact with direct implementations of `MongooseError` rather than `MongooseError` itself, and these client classes do not need to know the behavior of `MongooseError` nor the built-in JavaScript Error Object. As a result, error-handling classes structures within Mongoose follow the Law of Demeter as well.
 
 ## Liskov Substitution Principle
 
