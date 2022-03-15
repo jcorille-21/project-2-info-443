@@ -131,7 +131,7 @@ This allows for correctness of the data type that users receive from queries. Ho
 - Otherwise, save data into database
 
 ![Performance Model](img/performance_model.png)
-*Figure ?: Benchmark Data referenced from (https://bit.ly/37whz7l) and (https://bit.ly/3MJlxK1)*
+*Figure ?: Benchmark Data referenced from [source 1](https://blog.jscrambler.com/mongodb-native-driver-vs-mongoose-performance-benchmarks) and [source 2](https://github.com/Automattic/mongoose/issues/8751)*
 
 ### Identify the Performance-Critical Structure
 In the diagram above, the performance-critical components start at the **model** query where depending on the user’s request (reading or writing to data), it can impact the performance for the rest of the process flow. Latency is further introduced by the **casting processor** which takes in the user input data and checks if it can be casted to the enforced types in the **Data Schema**. Finally, the save() operation is executed where the row is added to the **MongoDB database** collection.
