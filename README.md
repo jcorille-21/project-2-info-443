@@ -286,7 +286,7 @@ MongooseError’s sole responsibility is to throw an Error (built-in JavaScript 
 ## Dependency Inversion Principle
 
 a: `.lib/cast.js`
-![Dependency Inversion Principle 2](img/exampleOfDependcy.png)
+![Dependency Inversion Principle 2](img/Pipe.png)
 Within `.lib/cast.js`, the function `_cast(val, numbertype, context)` assigns `numbertype.castForQuery({ val: item, context: context })` function to val[nkey] . However, depending on the content of numbertype, the client who invoke `castForQuery()` method will conditionally invoke different implementations of `castForQuery()` based on the schema data type (such as `castForQuery()` of `.lib/schema/date.js` or `.lib/schema/boolean.js`). Hence cast.js doesn't need to consider which implementation of `castForQuery()` should cast.js call as long as cast.js knows the data type of value that needs to be casted. Thus cast.js adheres to the dependency inversion principle.
 
 
