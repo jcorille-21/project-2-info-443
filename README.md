@@ -6,7 +6,7 @@
 
 Mongoose provides an Object Relational Model (ORM) for Node.js applications to connect to MongoDB NoSQL databases. This framework is primarily written in JavaScript with a little bit of TypeScript code.
 
-Mongoose is an abstracted  interface of MongoDB by defining models to interact with the database using native JavaScript syntax and semantics. Users can define a schema and perform query operations on MongoDB using Mongoose. Additionally, it provides an option for users to enforce strongly-typed schemas as well. Overall the library aims to make working with MongoDB easier for JavaScript application developers with the features mentioned above.
+Mongoose is an abstracted interface of MongoDB by defining models to interact with the database using native JavaScript syntax and semantics. Users can define a schema and perform query operations on MongoDB using Mongoose. Additionally, it provides an option for users to enforce strongly-typed schemas as well. Overall the library aims to make working with MongoDB easier for JavaScript application developers with the features mentioned above.
 
 People who maintain mongoose are a team or company called Automattic. This company also maintains a bunch of other websites or applications like Tumblr, Jetpack, and Gravatar. The Automattic company is in charge of approving changes to the code.
 
@@ -27,7 +27,7 @@ Required interfaces include modules that are needed for the module to work. Modu
 
 Provided interfaces include modules that need the module to work. Going back to the `cast` directory, the `helpers` directory needs at least one file provided from the `cast` directory for its modules to work. This is why the `helpers` directory is listed as a provided interface for the `cast` component.
 
-Initially the components were linked together by relationship, but this ended up being very messy for a model. The components are in the /lib directory, which is the directory at the very top. The /lib directory contains all folders underneath. The folders are listed below:
+Initially the components were linked together by relationship, but this ended up being very messy for a model. The components are in the `/lib` directory, which is the directory at the very top. The `/lib` directory contains all folders underneath. The folders are listed below:
 
 | **Directory** | **Description**                                                           |
 |---------------|---------------------------------------------------------------------------|
@@ -70,7 +70,7 @@ Our codeline model shows **all the source code** in the Mongoose repository.  Ag
 
 ## Testing and Configuration
 
-Mongoose library uses `Mocha` testing framework to test its codes. The testing files are located underneath the `test` folder, which is located in the root folder. Each named test file represent a module/feature being tested on (such as schema-related operations or special handling on specific data type values). This group attempted to run Mocha tests, either via IDE or command line, but only David Xie can successfully initiate Mocha tests via his WebStorm IDE by clicking on its run buttons; other group members did not observe any output (or experience non-test related errors) while attempting to run test files in VS Code IDE nor Node.js command line.
+Mongoose library uses Mocha testing framework to test its codes. The testing files are located underneath the `test` folder, which is located in the root folder. Each named test file represent a module/feature being tested on (such as schema-related operations or special handling on specific data type values). This group attempted to run Mocha tests, either via IDE or command line, but only David Xie can successfully initiate Mocha tests via his WebStorm IDE by clicking on its run buttons; other group members did not observe any output (or experience non-test related errors) while attempting to run test files in VS Code IDE nor Node.js command line.
 
 ![Test Example](img/testExample.png)
 *Figure 3: Example of Testing Code*
