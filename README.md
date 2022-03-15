@@ -70,7 +70,7 @@ Our codeline model shows **all the source code** in the Mongoose repository.  Ag
 
 ## Testing and Configuration
 
-Mongoose library uses `Mocha` testing framework to test its codes. The testing files are located underneath the `test` folder, which is located in the root folder. Each named test file represent a module/feature being tested on (such as schema-related operations or special handling on specific data type values). This group attempted to run Mocha tests, either via IDE or command line, but only David Xie can successfully initiate Mocha tests via his WebStorm IDE; other group members did not observe any output (or experience non-test related errors) while attempting to run test files in VS Code IDE nor Node.js command line.
+Mongoose library uses `Mocha` testing framework to test its codes. The testing files are located underneath the `test` folder, which is located in the root folder. Each named test file represent a module/feature being tested on (such as schema-related operations or special handling on specific data type values). This group attempted to run Mocha tests, either via IDE or command line, but only David Xie can successfully initiate Mocha tests via his WebStorm IDE by clicking on its run buttons; other group members did not observe any output (or experience non-test related errors) while attempting to run test files in VS Code IDE nor Node.js command line.
 
 ![Test Example](img/testExample.png)
 *Figure 3: Example of Testing Code*
@@ -89,26 +89,27 @@ Additionally, many developers use their own branches to test code. As of the tim
 
 # Applied Perspective
 
-While Mongoose provides many advantages that promote its prevalence among JavaScript programs that need to interact with MongoDB, we choose to analyze Mongoose library’s **Performance Perspective**. Because Mongoose handles many queries from MongoDB, the performance of the system is very important to consider when looking at the architecture. The query speed should be fast so users perform operations on MongoDB in a timely manner.
+While Mongoose provides many advantages that promote its prevalence among JavaScript programs that need to interact with MongoDB, we choose to analyze Mongoose library’s **Performance Perspective**. Because Mongoose handles many queries (usually come from user-facing web information systems) on MongoDB, the performance of the system is very important to consider when looking at the architecture. The query speed should be fast so clients and users perform operations on MongoDB in a timely manner.
 
 ## Response Time
 
-When JavaScript developers uses Mongoose, they will define a typed schema by using new mongoose.Schema({}) API similar to the one below, where as each field are typed.
+When JavaScript developers uses Mongoose, they will define a typed schema by using `new mongoose.Schema({...})` API similar to the one below, whereas each field are typed.
 
+[Define a database schema via Mongoose](https://mongoosejs.com/docs/guide.html)
 ![](img/image10.png)
 However, when JavaScript programs add data to MongoDB using Mongoose, Mongoose will first attempt to cast the provided input to the predefined schema types by going through a series of if-statement checks (which would take extra time), even though the user adds a correct-typed value. The concern of slowed response time due to type checking and casting is least useful for a large and clean dataset, according to [this blog post](https://towardsdatascience.com/the-drastic-mistake-of-using-mongoose-to-handle-your-big-data-a3c408e21a4c).
 
-For instance, if user pass in false (a boolean-typed value) at a table field that requires boolean value, according to lib/cast/boolean.js , Mongoose still need test whether false is within `Set([true, 'true', 1, '1', 'yes'])` to see whether false is a truthy value before testing whether this falsy value. As a result, Mongoose will have a higher response time to input a false value to the database compared to input a true value.
+For instance, if user pass in `false` (a boolean-typed value) at a table field that requires boolean value, according to lib/cast/boolean.js , Mongoose still need test whether `false` is within `Set([true, 'true', 1, '1', 'yes'])` to see whether false is a truthy value before testing whether this falsy value. As a result, Mongoose will have a higher response time to input a `false` value to the database compared to input a `true` value.
 
 Code snippet within `lib/cast/boolean.js file`
 ![](img/image15.png)
 
-As another example, when users wants to insert a value to a String-typed field, Mongoose needs to first check whether the user passed in a null value or the user passed in the ID value of a document first, before checking whether this value can be casted to a String using the default .toString() method on an object. As a result, inserting an Object ID to a String-typed field takes less time (aka. reducing the database operations’ response time) compared to inserting a String-typed value to String-typed field; this issue is evident when we are inserting a large amount of data that is guaranteed to be String-typed.
+As another example, when users want to insert a value to a String-typed field, Mongoose needs to first check whether the user passed in a null value or the user passed in the ID value of a document first, before checking whether this value can be casted to a String using the default `.toString()` method on an object. As a result, inserting an Object ID to a String-typed field takes less time (aka. reducing the database operations’ response time) compared to inserting a String-typed value to String-typed field; this issue is evident when we are inserting a large amount of data that is guaranteed to be String-typed (aka data is clean).
 
 Code snippet in `lib/cast/string.js`
 ![](img/image11.png)
 
-Side note on type casting and system predictability: the time consumption of type-casting processes is predictable, as all input values always go through <type>.js file to attempt casting value to the desired type (according to the type of schema). In addition, <type>.js files’ behaviors will not change during runtime, making type-casting operation stable (even though it reduces response time for Mongoose to insert values to MongoDB.
+Side note on type casting and system predictability: the time consumption of type-casting processes is predictable, as all input values always go through <type>.js file to attempt casting value to the desired type (according to the type of schema). In addition, <type>.js files’ behaviors will not change during runtime, making type-casting operation stable, even though it reduces response time for Mongoose to insert values to MongoDB.
 
 ## Throughput
 
@@ -117,6 +118,7 @@ MongoDB is a document-based database, indicating its data can be unstructured. I
 When using Mongoose, JavaScript client developers can set the database schema type while defining the table schema (such as declaring a String-typed column called `title`, in the below example). In contrast, developers need to explicitly define a typed-schema separately if they use native MongoDB syntax ([source](https://docs.mongodb.com/manual/core/schema-validation/#std-label-schema-validation-json)). Thus, the schema type enforcement reduces the client code’s need to add more code to check returned data (from database) and cast to client’s desired type.
 
 ![Schema Example](img/schemaExample.png)
+
 *Figure ???: Example of a Schema*
 
 This allows for correctness of the data type that users receive from queries. However, as a result of having many cast checks, these checks cause a drop in performance as a result. Someone had an example of a [benchmark performance between MongoDB and Mongoose](https://bugwheels94.medium.com/performance-difference-in-mongoose-vs-mongodb-60be831c69ad), and found that MongoDB can be faster at times. This may be due to the architecture of Mongoose, where it calls from multiple sources like in `lib/cast` to `lib/modules`, etc. This would [spell trouble for larger datasets](https://towardsdatascience.com/the-drastic-mistake-of-using-mongoose-to-handle-your-big-data-a3c408e21a4c) because of the reliance on multiple modules at once. Mongoose would certainly take a performance hit with large data.
@@ -131,13 +133,16 @@ This allows for correctness of the data type that users receive from queries. Ho
 - Otherwise, save data into database
 
 ![Performance Model](img/performance_model.png)
+
 *Figure ?: Benchmark Data referenced from [source 1](https://blog.jscrambler.com/mongodb-native-driver-vs-mongoose-performance-benchmarks) and [source 2](https://github.com/Automattic/mongoose/issues/8751)*
 
 ### Identify the Performance-Critical Structure
-In the diagram above, the performance-critical components start at the **model** query where depending on the user’s request (reading or writing to data), it can impact the performance for the rest of the process flow. Latency is further introduced by the **casting processor** which takes in the user input data and checks if it can be casted to the enforced types in the **Data Schema**. Finally, the save() operation is executed where the row is added to the **MongoDB database** collection.
+In the diagram above, the performance-critical components start at the **model** query where depending on the user’s request (reading or writing to data), it can impact the performance for the rest of the process flow. Latency is further introduced by the **casting processor** which takes in the user input data and checks if it can be casted to the enforced types in the **Data Schema**. Finally, the `save()` operation is executed where the row is added to the **MongoDB database** collection.
 
 ### Identify the Key Performance Metrics
-In the context of Mongoose, the key metrics to evaluate were reads/writes per second and the latency time. These metrics are the most important as read and write operations are the main ones that users perform with the system. For the benchmark, the Apache Benchmark suite was used where it would fire 150 requests per second from 4 concurrent users which would be a sufficient amount to see the extent of Mongoose’s throughput limit. From the benchmark it was found that Mongoose’s throughput was 583 reads/sec and 384 writes/sec. Its latency time was 1.71ms for reads and 2.60ms for writes. It should be noted that compared to the Native MongoDB driver, its performance was significantly better with a throughput of 1200 reads/sec with 0.83ms latency and 1128 writes/sec with 0.89ms latency. This is not surprising due to the validation and type-casting processing that Mongoose needs to perform between reading or writing the given data. The latency performance loss can be significant though as one benchmark used a schema with over 750 types to validate. It was found to take around 22-30 seconds to finally save it into the database. However, disabling validation reduced the entire operation to less than 1 second. Overall, Mongoose represents a tradeoff between performance and functionality. When using Mongoose, the developer will expect degraded performance but can then obtain more features such as data validation, sanitization from possible injection attacks, and consistency within an enforced schema.
+In the context of Mongoose, the key metrics to evaluate were reads/writes per second and the latency time. These metrics are the most important as read and write operations are the main ones that users perform with the system. For the benchmark, the Apache Benchmark suite was used where it would fire 150 requests per second from 4 concurrent users which would be a sufficient amount to see the extent of Mongoose’s throughput limit. 
+
+From the benchmark, it was found that Mongoose’s throughput was 583 reads/sec and 384 writes/sec. Its latency time was 1.71ms for reads and 2.60ms for writes. In contrast, the Native MongoDB driver's performance was significantly better with a throughput of 1200 reads/sec with 0.83ms latency and 1128 writes/sec with 0.89ms latency. This is not surprising due to the validation and type-casting processing that Mongoose needs to perform between reading or writing the given data. The latency performance loss can be significant though as one benchmark used a schema with over 750 types to validate. It was found to take around 22-30 seconds to finally save it into the database. However, disabling validation reduced the entire operation to less than 1 second. Overall, Mongoose represents a tradeoff between performance and functionality. When using Mongoose, the developer will expect degraded performance but can then obtain more features such as data validation, sanitization from possible injection attacks, and consistency within an enforced schema.
 
 # Identify Styles and Patterns
 
