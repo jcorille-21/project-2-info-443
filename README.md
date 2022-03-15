@@ -142,7 +142,7 @@ In the context of Mongoose, the key metrics to evaluate were reads/writes per se
 # Identify Styles and Patterns
 
 ## High-level architectural style
-Mongoose applies the Pipes and the **Filters architectural style**, where the flow of data is driven by data and the whole system is decomposed into components of data source, filters, pipes, and data sinks . The users’ query will select the input  and Mongoose works as the filter, and the mongoDB is the result being fetch. 
+Mongoose applies the **Pipes and Filters architectural style**, where the flow of data is driven by data and the whole system is decomposed into components of data source, filters, pipes, and data sinks . The users’ query will select the input  and Mongoose works as the filter, and the mongoDB is the result being fetch. 
 ![Example of Layered architectural style](img/exampleOfLayered.png)
 
 ## Decorator Pattern
