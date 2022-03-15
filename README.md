@@ -293,13 +293,11 @@ const postSchema = new mongoose.Schema({
 
 a: `.lib/cast.js`
 
-![Dependency Inversion Principle 2](img/Pipe.png)
-
 ![Dependency Inversion Principle 2](img/exampleOfDepency.png)
 
 *Figure 27: `_cast` function*
 
-Within `.lib/cast.js`, the function `_cast(val, numbertype, context)` assigns `numbertype.castForQuery({ val: item, context: context })` function to **val[nkey]** . However, depending on the content of numbertype, the client who invoke `castForQuery()` method will conditionally invoke different implementations of `castForQuery()` based on the schema data type (such as `castForQuery()` of `.lib/schema/date.js` or `.lib/schema/boolean.js`). Hence cast.js doesn't need to consider which implementation of `castForQuery()` should cast.js call as long as cast.js knows the data type of value that needs to be casted. Thus cast.js adheres to the dependency inversion principle.
+Within `.lib/cast.js`, the function `_cast(val, numbertype, context)` assigns `numbertype.castForQuery({ val: item, context: context })` function to `val[nkey]` . However, depending on the content of `numbertype`, the client who invoke `castForQuery()` method will conditionally invoke different implementations of `castForQuery()` based on the schema data type (such as `castForQuery()` of `.lib/schema/date.js` or `.lib/schema/boolean.js`). Hence cast.js doesn't need to consider which implementation of `castForQuery()` should cast.js call as long as cast.js knows the data type of value that needs to be casted. Thus cast.js adheres to the dependency inversion principle.
 
 
 ## Principle of Least Knowledge (Law of Demeter)
@@ -317,7 +315,7 @@ Here is an example of [database schema creation](https://mongoosejs.com/docs/gui
 The MongoDB native syntax to create a table and [define a schema](https://docs.mongodb.com/manual/core/schema-validation/#std-label-schema-validation-json) for this table is similar to this:
 ![](img/Screen Shot 2022-03-14 at 4.41.08 PM.png)
 
-In contrast, for JavaScript clients using mysql and mysql2 modules to interact with MySQL database, JavaScript clients need to use SQL query to perform database operations (highlighted part are SQL syntax, the rest of them are JavaScript syntax).
+In contrast, for JavaScript clients using `mysql` and `mysql2` modules to interact with MySQL database, JavaScript clients need to use SQL query to perform database operations (highlighted part are SQL syntax, the rest of them are JavaScript syntax).
 ![app.get](img/Screen Shot 2022-03-14 at 4.42.43 PM.png)
 
 ## b: `lib/error/mongooseError.js` and Error classes (within the `lib/error` folder) that extend `MongooseError`.
@@ -326,24 +324,27 @@ In contrast, for JavaScript clients using mysql and mysql2 modules to interact w
 
 *Figure 29: another example of Law of Demeter*
 
-Error-handling classes – such as `CastError`, `DivergentArrayError`, `MissingSchemaError`, `DocumentNotFoundError` – all extend the `MongooseError` object, and `MongooseError` extends the built-in JavaScript Error object. String, Boolean, and some other client classes interact with direct implementations of `MongooseError` rather than `MongooseError` itself, and these client classes do not need to know the behavior of `MongooseError` nor the built-in JavaScript Error Object. As a result, error-handling classes structures within Mongoose follow the Law of Demeter as well.
+Error-handling classes – such as `CastError`, `DivergentArrayError`, `MissingSchemaError`, `DocumentNotFoundError` – all extend the `MongooseError` object, and `MongooseError` extends the built-in JavaScript `Error` object. String, Boolean, and some other client classes interact with direct implementations of `MongooseError` rather than `MongooseError` itself, and these client classes do not need to know the behavior of `MongooseError` nor the built-in JavaScript `Error` Object. As a result, error-handling classes structures within Mongoose follow the Law of Demeter as well.
 
 ## Liskov Substitution Principle
 
 ### a: `lib/types/subdocument.js` that adds more behaviors to `lib/document.js`
 
-For the **Liskov Substitution Principle**, there are two classes that promote this design pattern. These files are located in `lib/document.js`, which is the Document class, and `lib/types/subdocument.js`, which is the SubDocument class. See Figures 30 and 31 below.
+For the **Liskov Substitution Principle**, there are two classes that promote this design pattern. These files are located in `lib/document.js`, which is the `Document` class, and `lib/types/subdocument.js`, which is the `SubDocument` class. See Figures 30 and 31 below.
 
 ![document.js](img/documentDotJs.png)
+
 *Figure 30: `lib/document.js`*
 
 ![subdocument.js](img/subdocumentDotJs.png)
+
 *Figure 31: `lib/types/subdocument.js`*
 
 These two classes promote the *Liskov Substitution Principle* because the `SubDocument` could completely replace an instance of the `Document` class. This is because the `SubDocument` checks if there is a valid parent of itself. If there isn’t, then it just calls the `Document` class. This means that the `SubDocument` instance would just be a `Document` object. There is some extra logic when it does have a parent, but it still calls the `Document` class in the end.
 
-## b: checkRequired functions in several `.js` files within `lib/schema`, and checkRequired function of lib/schematype.js
+## b: `checkRequired` functions in several `.js` files within `lib/schema`, and `checkRequired` function of `lib/schematype.js`
 ![checkRequired function in lib/schematype.js](img/Liskov-Substitution.png)
+
 *Figure 32: `checkRequired` function in `lib/schematype.js`*
 
 ![Code of lib/schema/boolean.js](img/Liskov-Substitution1.png)
@@ -354,7 +355,7 @@ These two classes promote the *Liskov Substitution Principle* because the `SubDo
 
 *Figure 34: Code of `lib/schema/number.js`*
 
-Within the `.lib/schema/operators` folder, boolean.js and number.js all use the same  checkRequired function in lib/schematype.js. Thus this match the *Liskov Substitution Principle* because these “SubDocuments” replace and override the instance from the schematype class. For example, in number.js, it overrides the function the required validator uses to check whether a **string value** passes the ‘required’ check. While in boolean.js, they override the function the required validator uses to check whether a **boolean value** passes the ‘required’ check.
+Within the `.lib/schema/operators` folder, `boolean.js` and `number.js` all use the same `checkRequired` function in `lib/schematype.js`. Thus this match the *Liskov Substitution Principle* because these “SubDocuments” replace and override the instance from the `schematype` class. For example, in `number.js`, it overrides the function the required validator uses to check whether a **string value** passes the ‘required’ check. While in `boolean.js`, they override the function the required validator uses to check whether a **boolean value** passes the ‘required’ check.
 
 ## Composite Reuse Principle
 
@@ -363,21 +364,21 @@ Within the `.lib/schema/operators` folder, boolean.js and number.js all use the 
 ![Composite Reuse Principle 1](img/CompReuse-1.png)
 *Figure 35: example of Composite Reuse Principle 1`*
 
-Within the `./lib/cast` folder, boolean.js uses an instance of `CastError` (`throw new CastError('boolean', value, path);` ) when it can’t convert a given value to a boolean value. Since `boolean.js` does not inherit the `CastError` itself and the `CastError` can exist by itself without `boolean.js` codes, `boolean.js` follows the Composite Reuse Principle.
+Within the `./lib/cast` folder, `boolean.js` uses an instance of `CastError` (`throw new CastError('boolean', value, path);` ) when it can’t convert a given value to a boolean value. Since `boolean.js` does not inherit the `CastError` itself and the `CastError` can exist by itself without `boolean.js` codes, `boolean.js` follows the Composite Reuse Principle.
 
 ### b: `lib/cast/string.js`
 
 ![](img/image8.png)
 *Figure 36: code of `lib/cast/string.js`*
 
-Within the `./lib/cast` folder, string.js also uses an instance of CastError (throw new CastError('string', value, path); ) when it can’t convert a given value to a String value. This error throwing behavior in string.js is similar to boolean.js .
+Within the `./lib/cast` folder, string.js also uses an instance of `CastError (throw new CastError('string', value, path); )` when it can’t convert a given value to a `String` value. This error throwing behavior in `string.js` is similar to `boolean.js` .
 
 ### c: `lib/schema.js`
 
 ![](img/image25.png)
 *Figure 37: code of `lib/schema.js`*
 
-Mongoose provides a `Schema.pick()` function allowing clients to “pick” a subset of schemas from the original schema. Mongoose will throw an instance of MongooseError object if the user does not pass an array in or the user's input is not in the original schema. Since this function does not inherit MongooseError but rather uses an instance of MongooseError, the `Schema.pick()` function favors composition over inheritance.
+Mongoose provides a `Schema.pick()` function allowing clients to “pick” a subset of schemas from the original schema. Mongoose will throw an instance of `MongooseError` object if the user does not pass an array in or the user's input is not in the original schema. Since this function does not inherit `MongooseError` but rather uses an instance of `MongooseError`, the `Schema.pick()` function favors composition over inheritance.
 
 # System Improvement
 
