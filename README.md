@@ -80,7 +80,7 @@ Mongoose library uses Mocha testing framework to test its codes. The testing fil
 
 Many test files require the use of a common test file called `common.js`. This is located underneath the `/test` folder. Some outside dependencies include the `assert` library, the `collection` component located in the `/lib` folder, and some error validation (not pictured) which is located in the `error` component in `/lib`. Since `assert` is used, this means that Mongoose utilizes **unit testing** on individual components for their testing.
 
-![common.js](img/Screen Shot 2022-03-14 at 9.52.26 PM.png)
+![common.js](img/common.js.png)
 
 *Figure 4: `common.js` Test File*
 
