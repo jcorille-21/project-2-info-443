@@ -181,8 +181,6 @@ Within lib/cursor, QueryCursor.js exposes JavaScript’s Streams3 interface, all
 
 *Figure 12: [Cursor interface’s API documentation](https://mongoosejs.com/docs/api/query.html#query_Query-cursor)*
 
-Code snippet in `lib/cursor/QueryCursor.js`
-
 ![](img/image34.png)
 
 *Figure 13: Code snippet in `lib/cursor/QueryCursor.js`*
@@ -268,6 +266,7 @@ In the boolean.js file, one can modify which values should be interpreted as tru
 
 ## Single Responsibility Principle
 ### a: `lib/schema` folder
+
 ![Open Closed Principle 1](img/OpenClosed-1.png)
 
 *Figure 25: `lib/schema/operators` directory*
@@ -291,7 +290,11 @@ MongooseError’s sole responsibility is to throw an Error (built-in JavaScript 
 ## Dependency Inversion Principle
 
 a: `.lib/cast.js`
+<<<<<<< Updated upstream
 ![Dependency Inversion Principle 2](img/Pipe.png)
+=======
+![Dependency Inversion Principle 2](img/exampleOfDepency.png)
+>>>>>>> Stashed changes
 
 *Figure 27: `_cast` function*
 
@@ -343,9 +346,11 @@ These two classes promote the *Liskov Substitution Principle* because the `SubDo
 *Figure 32: `checkRequired` function in `lib/schematype.js`*
 
 ![Code of lib/schema/boolean.js](img/Liskov-Substitution1.png)
+
 *Figure 33: Code of `lib/schema/boolean.js`*
 
 ![Code of lib/schema/number.js](img/Liskov-Substitution2.png)
+
 *Figure 34: Code of `lib/schema/number.js`*
 
 Within the `.lib/schema/operators` folder, boolean.js and number.js all use the same  checkRequired function in lib/schematype.js. Thus this match the *Liskov Substitution Principle* because these “SubDocuments” replace and override the instance from the schematype class. For example, in number.js, it overrides the function the required validator uses to check whether a **string value** passes the ‘required’ check. While in boolean.js, they override the function the required validator uses to check whether a **boolean value** passes the ‘required’ check.
