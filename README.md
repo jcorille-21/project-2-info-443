@@ -290,11 +290,7 @@ MongooseError’s sole responsibility is to throw an Error (built-in JavaScript 
 ## Dependency Inversion Principle
 
 a: `.lib/cast.js`
-<<<<<<< Updated upstream
-![Dependency Inversion Principle 2](img/Pipe.png)
-=======
 ![Dependency Inversion Principle 2](img/exampleOfDepency.png)
->>>>>>> Stashed changes
 
 *Figure 27: `_cast` function*
 
