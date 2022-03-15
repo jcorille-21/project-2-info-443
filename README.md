@@ -220,7 +220,7 @@ Example 2: `lib/error/cast.js`
 ![](img/image9.png)
 Like DivergentArrayError, CastError also extends MongooseError functionality by adding CastError’s specific behaviors, instead of modifying MongooseError behaviors.
 
-### c: lib/cast/boolean.js
+### c: `lib/cast/boolean.js`
 ![](img/image27.png)
 In the boolean.js file, one can modify which values should be interpreted as true or false by modifying content in two Set objects, without the need to modify the actual boolean casting logic. As a result, one may choose to add the equivalent of “true” or “false” in other languages (such as “oui” or “non” in French) by adding them in the convertToTrue and convertToFalse Sets.
 
