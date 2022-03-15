@@ -310,13 +310,13 @@ Mongoose provides an abstracted interface allowing JavaScript programs to intera
 *Figure 28: example of Law of Demeter*
 
 Here is an example of [database schema creation](https://mongoosejs.com/docs/guide.html) using Mongoose syntax
-![](img/Screen Shot 2022-03-14 at 4.39.56 PM.png)
+![](img/whodidthis1.png)
 
 The MongoDB native syntax to create a table and [define a schema](https://docs.mongodb.com/manual/core/schema-validation/#std-label-schema-validation-json) for this table is similar to this:
-![](img/Screen Shot 2022-03-14 at 4.41.08 PM.png)
+![](img/whodidthis2.png)
 
-In contrast, for JavaScript clients using `mysql` and `mysql2` modules to interact with MySQL database, JavaScript clients need to use SQL query to perform database operations (highlighted part are SQL syntax, the rest of them are JavaScript syntax).
-![app.get](img/Screen Shot 2022-03-14 at 4.42.43 PM.png)
+In contrast, for JavaScript clients using mysql and mysql2 modules to interact with MySQL database, JavaScript clients need to use SQL query to perform database operations (highlighted part are SQL syntax, the rest of them are JavaScript syntax).
+![app.get](img/whodidthis3.png)
 
 ## b: `lib/error/mongooseError.js` and Error classes (within the `lib/error` folder) that extend `MongooseError`.
 
