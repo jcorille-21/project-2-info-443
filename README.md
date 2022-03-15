@@ -379,8 +379,8 @@ Mongoose provides a `Schema.pick()` function allowing clients to “pick” a su
 ## Refactoring:
 - `lib/error/serverSelection.js` : clarify constant naming for error messages.
 - `lib/schema.js` : in `Schema._clone()` function in line 336, group similar operations (within this function) together, use ES6 spread operators to favor modern JavaScript syntax.
-- [David]
-- [Jerome]
+- `test/model.create.test.js`: renamed the variable `B` to `testModel`, renamed variables `p` to either `returnPromise` or `callback`. This seemed necessary because p has two different functions, and B is not too specific of a variable name
+- `lib/helpers/clone.js`: removed a confusing comment on lines 115-118 that just stated “ignore.”
 - `lib/schema.js`: Initial comment for function at line 314 was redundant (Stated “returns a deep copy of the schema”). I converted the anonymous function to a named function called `schemaDeepCopy` so that the function’s purpose is more specific (and can therefore remove the details from the comment). Additionally renamed `s` const variable to schema for better readability as well
 
 ## Bug fix:
