@@ -144,14 +144,14 @@ This allows for correctness of the data type that users receive from queries. Ho
 In the diagram above, the performance-critical components start at the **model** query where depending on the user’s request (reading or writing to data), it can impact the performance for the rest of the process flow. Latency is further introduced by the **casting processor** which takes in the user input data and checks if it can be casted to the enforced types in the **Data Schema**. Finally, the `save()` operation is executed where the row is added to the **MongoDB database** collection.
 
 ### Identify the Key Performance Metrics
-In the context of Mongoose, the key metrics to evaluate were reads/writes per second and the latency time. These metrics are the most important as read and write operations are the main ones that users perform with the system. For the benchmark, the Apache Benchmark suite was used where it would fire 150 requests per second from 4 concurrent users which would be a sufficient amount to see the extent of Mongoose’s throughput limit. 
+In the context of Mongoose, the key metrics to evaluate were reads/writes per second and the latency time. These metrics are the most important as read and write operations are the main ones that users perform with the system. For the benchmark, the Apache Benchmark suite was used where it would fire 150 requests per second from 4 concurrent users which would be a sufficient amount to see the extent of Mongoose’s throughput limit.
 
 From the benchmark, it was found that Mongoose’s throughput was 583 reads/sec and 384 writes/sec. Its latency time was 1.71ms for reads and 2.60ms for writes. In contrast, the Native MongoDB driver's performance was significantly better with a throughput of 1200 reads/sec with 0.83ms latency and 1128 writes/sec with 0.89ms latency. This is not surprising due to the validation and type-casting processing that Mongoose needs to perform between reading or writing the given data. The latency performance loss can be significant though as one benchmark used a schema with over 750 types to validate. It was found to take around 22-30 seconds to finally save it into the database. However, disabling validation reduced the entire operation to less than 1 second. Overall, Mongoose represents a tradeoff between performance and functionality. When using Mongoose, the developer will expect degraded performance but can then obtain more features such as data validation, sanitization from possible injection attacks, and consistency within an enforced schema.
 
 # Identify Styles and Patterns
 
 ## High-level architectural style
-Mongoose applies the **Pipes and Filters architectural style**, where the flow of data is driven by data and the whole system is decomposed into components of data source, filters, pipes, and data sinks . The users’ query will select the input and Mongoose works as the filter, and the mongoDB is the result being fetch. 
+Mongoose applies the **Pipes and Filters architectural style**, where the flow of data is driven by data and the whole system is decomposed into components of data source, filters, pipes, and data sinks . The users’ query will select the input and Mongoose works as the filter, and the mongoDB is the result being fetch.
 
 ![Example of Pipes and Filters architectural style](img/Pipe.png)
 
@@ -383,6 +383,9 @@ Mongoose provides a `Schema.pick()` function allowing clients to “pick” a su
 ## Refactoring:
 - `lib/error/serverSelection.js` : clarify constant naming for error messages.
 - `lib/schema.js` : in `Schema._clone()` function in line 336, group similar operations (within this function) together, use ES6 spread operators to favor modern JavaScript syntax.
+- [David]
+- [Jerome]
+- `lib/schema.js`: Initial comment for function at line 314 was redundant (Stated “returns a deep copy of the schema”). I converted the anonymous function to a named function called `schemaDeepCopy` so that the function’s purpose is more specific (and can therefore remove the details from the comment). Additionally renamed `s` const variable to schema for better readability as well
 
 ## Bug fix:
 - [Github Issue 11515](https://github.com/Automattic/mongoose/issues/11515)
